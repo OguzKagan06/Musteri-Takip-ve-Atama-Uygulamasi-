@@ -33,11 +33,15 @@ def logout():
 @bp.route('/register', methods=['GET', 'POST'])
 @login_required
 def register():
-    if current_user.role != 'admin':
+    if current_user.role not in ['admin', 'super_admin']:
         flash('Sadece yöneticiler yeni kullanıcı oluşturabilir.', 'danger')
         return redirect(url_for('main.index'))
     form = RegisterForm()
     if form.validate_on_submit():
+        if form.role.data == 'super_admin':
+            flash('Güvenlik ihlali: Kurucu rolünde kullanıcı oluşturulamaz.', 'danger')
+            return redirect(url_for('auth.register'))
+            
         user = User(username=form.username.data, role=form.role.data)
         user.set_password(form.password.data)
         db.session.add(user)

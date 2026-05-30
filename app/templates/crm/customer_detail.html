@@ -17,13 +17,13 @@
         <div class="glass-card rounded-xl overflow-hidden h-full flex flex-col">
             <div class="bg-primary/10 border-b border-primary/20 p-4 flex justify-between items-center">
                 <h5 class="font-headline-lg-mobile text-headline-lg-mobile text-primary">{{ customer.name }} {{ customer.surname }}</h5>
-                {% if current_user.role == 'admin' or customer.assigned_user_id == current_user.id %}
+                {% if current_user.role in ['admin', 'super_admin'] or customer.assigned_user_id == current_user.id %}
                 <div class="flex items-center gap-2 m-0 p-0">
                     <a href="{{ url_for('crm.edit_customer', id=customer.id) }}" class="bg-primary/20 text-primary hover:bg-primary/40 border border-primary/50 px-3 py-1 rounded transition-colors text-sm flex items-center gap-1">
                         <span class="material-symbols-outlined text-[16px]">edit</span>
                         Düzenle
                     </a>
-                    {% if current_user.role == 'admin' %}
+                    {% if current_user.role in ['admin', 'super_admin'] %}
                     <form method="POST" action="{{ url_for('crm.delete_customer', id=customer.id) }}" onsubmit="return confirm('Bu müşteriyi tamamen silmek istediğinize emin misiniz? Müşteriye ait tüm notlar da silinecektir!');" class="m-0 p-0">
                         <button type="submit" class="bg-red-500/20 text-red-400 hover:bg-red-500/40 border border-red-500/50 px-3 py-1 rounded transition-colors text-sm flex items-center gap-1">
                             <span class="material-symbols-outlined text-[16px]">delete</span>

@@ -1,0 +1,41 @@
+# Hiyerarşik Rol Sistemi ve Güvenlik Planı
+
+Sisteme `super_admin` (Kurucu) rolünü entegre ederek, yöneticilerin (admin) birbirlerini veya kurucuyu silmesini engelleyecek, katı bir güvenlik hiyerarşisi kuracağız.
+
+## User Review Required
+
+Aşağıdaki backend güvenlik kontrollerini ve UI (arayüz) güncellemelerini lütfen inceleyip onaylayın.
+
+## Proposed Changes
+
+### app/main/routes.py
+Admin ve Super Admin erişimleri ile silme mantığı (logic) güncellenecek.
+
+#### [MODIFY] app/main/routes.py
+*   `/admin/users` ve `/admin/users/delete/<id>` rotalarındaki yetki kontrolü `if current_user.role != 'admin':` yerine `if current_user.role not in ['admin', 'super_admin']:` olarak değiştirilecek.
+*   **Silme Güvenlik Katmanı:** `delete_user` fonksiyonunda şifre doğrulandıktan hemen sonra şu kontroller yapılacak:
+    1.  `if target_user.role == 'super_admin':` -> `flash('Kurucu hesabı silinemez!', 'danger')` ve iptal.
+    2.  `elif current_user.role == 'admin' and target_user.role in ['admin', 'super_admin'] and current_user.id != target_user.id:` -> `flash('Yetkisiz işlem: Sadece Kurucu diğer yöneticileri silebilir.', 'danger')` ve iptal.
+*   Eğer bir yönetici (veya arayıcı) kendi kendini silerse, işlemden sonra güvenlik gereği oturumu kapatılacak (`logout_user()` çağrılacak).
+
+### app/templates/main/admin_users.html
+Rol isimleri Türkçeleştirilecek ve butonlar hiyerarşiye göre gizlenecek/devre dışı bırakılacak.
+
+#### [MODIFY] app/templates/main/admin_users.html
+*   Rol Sütunu Görünümü: `super_admin` ise **"Kurucu"** (Örn: Mor renkli rozet), `admin` ise **"Yönetici"**, `arayıcı` (veya `user`) ise **"Arayıcı"** yazacak şekilde güncellenecek.
+*   **Sil Butonu Görünürlüğü (Jinja If-Else):**
+    *   Eğer satırdaki kullanıcı `super_admin` ise: Silme butonu (ve modal yapısı) hiçbir şekilde HTML'e (DOM) eklenmeyecek. Sadece "Kurucu Silinemez" ibaresi yer alacak.
+    *   Eğer `current_user.role == 'admin'` ise VE satırdaki kişi de `admin` ise (ancak kendisi değilse): Buton gösterilmeyecek veya "Yetkisiz" yazacak.
+    *   Kişi **kendisi** ise: Kendi satırında her halükarda Sil butonu aktif olarak görülecek.
+
+### app/auth/routes.py
+Formlar üzerinden oluşabilecek açıkları engellemek için yeni kayıt koruması eklenecek.
+
+#### [MODIFY] app/auth/routes.py
+*   `/register` rotasındaki yetki kontrolü de `admin` ve `super_admin` kapsayacak şekilde güncellenecek.
+*   Formdan (Postman gibi araçlarla veya HTML müdahalesiyle) zorla `super_admin` rolü gönderilmeye çalışılırsa diye, kayıt işlemi öncesi `if form.role.data == 'super_admin':` şeklinde bir mantıksal kontrol eklenip kayıt reddedilecek.
+
+## Verification Plan
+1. Veritabanından mevcut bir admin kullanıcısının rolü elle (manuel) `super_admin` yapılacak.
+2. Sisteme normal bir `admin` ile girilip Kullanıcı Yönetimi'ne bakılacak; Kurucu'nun ve diğer Admin'lerin yanında "Sil" butonunun çıkmadığı (veyahut tıklanamadığı) teyit edilecek. Kendi satırında ise butonun çalıştığı görülecek.
+3. Sisteme `super_admin` olarak girildiğinde herkesin yanında (kendi hariç) "Sil" butonunun açık olduğu ve kullanabildiği test edilecek.

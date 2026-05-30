@@ -160,7 +160,7 @@
         <p class="font-body-md text-body-md text-on-surface-variant opacity-70">Command Center</p>
     </div>
     
-    {% if current_user.is_authenticated and current_user.role == 'admin' %}
+    {% if current_user.is_authenticated and current_user.role in ['admin', 'super_admin'] %}
     <a href="{{ url_for('crm.new_customer') }}" class="ruby-btn font-body-md text-body-md font-medium py-3 px-4 rounded-lg w-full flex items-center justify-center gap-2 mb-8 transition-all duration-200 hover:scale-95">
         <span class="material-symbols-outlined text-[18px]">add</span>
         Yeni Kayıt Ekle
@@ -183,7 +183,7 @@
                 <span class="font-body-md text-body-md">Müşteri Yönetimi</span>
             </a>
         </li>
-        {% if current_user.role == 'admin' %}
+        {% if current_user.role in ['admin', 'super_admin'] %}
         <li>
             <a class="flex items-center gap-3 px-3 py-3 rounded-lg {% if request.endpoint == 'auth.register' %}text-primary font-bold border-r-2 border-primary bg-primary/10{% else %}text-on-surface-variant font-medium opacity-70 hover:bg-primary/10 hover:text-primary hover:opacity-100{% endif %} transition-all duration-200" href="{{ url_for('auth.register') }}">
                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' {% if request.endpoint == 'auth.register' %}1{% else %}0{% endif %};">person_add</span>
@@ -194,6 +194,12 @@
             <a class="flex items-center gap-3 px-3 py-3 rounded-lg {% if request.endpoint == 'main.send_notification' %}text-primary font-bold border-r-2 border-primary bg-primary/10{% else %}text-on-surface-variant font-medium opacity-70 hover:bg-primary/10 hover:text-primary hover:opacity-100{% endif %} transition-all duration-200" href="{{ url_for('main.send_notification') }}">
                 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' {% if request.endpoint == 'main.send_notification' %}1{% else %}0{% endif %};">campaign</span>
                 <span class="font-body-md text-body-md">Bildirim Gönder</span>
+            </a>
+        </li>
+        <li>
+            <a class="flex items-center gap-3 px-3 py-3 rounded-lg {% if request.endpoint == 'main.admin_users' %}text-primary font-bold border-r-2 border-primary bg-primary/10{% else %}text-on-surface-variant font-medium opacity-70 hover:bg-primary/10 hover:text-primary hover:opacity-100{% endif %} transition-all duration-200" href="{{ url_for('main.admin_users') }}">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' {% if request.endpoint == 'main.admin_users' %}1{% else %}0{% endif %};">manage_accounts</span>
+                <span class="font-body-md text-body-md">Kullanıcı Yönetimi</span>
             </a>
         </li>
         {% endif %}

@@ -1,0 +1,36 @@
+# Tüm Uygulama Genelinde Yönetici Yetki Kapsamının Genişletilmesi (Kurucu Entegrasyonu)
+
+Sisteme eklediğimiz "Kurucu" (`super_admin`) rolünün sadece kullanıcı listesi sayfasında değil, CRM modülünden HTML menülerine kadar uygulamanın tüm katmanlarında "Yönetici" (`admin`) ile aynı veya daha üstün yetkilere sahip olmasını sağlayacağız.
+
+## User Review Required
+
+Aşağıda taranıp güncellenecek olan tüm backend rotaları ve frontend HTML dosyalarını lütfen inceleyip onaylayın.
+
+## Proposed Changes
+
+### app/templates/ (HTML Şablonları)
+HTML dosyalarındaki tüm `if current_user.role == 'admin'` kontrolleri, `if current_user.role in ['admin', 'super_admin']` (Kurucu ve Yönetici görebilir) şeklinde güncellenecek.
+Taranacak dosyalar:
+*   `base.html`: Sol menüdeki "Kullanıcı Yönetimi", "Bildirim Gönder", "Yeni Kayıt Ekle" linkleri.
+*   `crm/dashboard.html`: İstatistik ve dışa aktarma butonları.
+*   `crm/customer_detail.html`: Müşteriyi Silme ve Düzenleme yetki butonları.
+*   `crm/add_customer.html`: Müşteri atama işlemi alanı.
+
+### app/crm/routes.py (Backend Modülleri)
+Veri manipülasyonunu (silme, atama, dışa aktarma vb.) engelleyen tüm katı `if current_user.role != 'admin':` kontrolleri, `if current_user.role not in ['admin', 'super_admin']:` olarak esnetilecek. 
+Aynı zamanda, müşteri listesindeki "Sadece Adminler görür" gibi filtreleme kısıtlamaları da `super_admin` eklenecek şekilde (`current_user.role in ['admin', 'super_admin']`) güncellenecek.
+Etkilenecek Rotalar:
+*   `/new` (Müşteri Ekleme - Müşteriyi başkasına atayabilme)
+*   `/edit` (Müşteri Düzenleme)
+*   `/delete` (Müşteri Silme)
+*   `/export` (Excel dışa aktarımı)
+*   `/api/users` (Kullanıcı listesini AJAX ile çekme)
+
+### app/main/routes.py (Backend Modülleri)
+*   `/admin/send-notification` (Bildirim Gönderme) sayfasındaki `if current_user.role != 'admin':` yetki kontrolü `not in ['admin', 'super_admin']` şeklinde değiştirilerek Kurucu'nun da bildirim atabilmesi sağlanacak.
+
+## Verification Plan
+1. Sisteme rolü `super_admin` olan bir kullanıcı ile giriş yapılacak.
+2. Sol menüde tüm yönetim butonlarının (Kullanıcı Yönetimi, Bildirim Gönder vb.) açık olduğu doğrulanacak.
+3. CRM Dashboard ekranında tüm Excel dışa aktarım (Export) ve Müşteri Silme butonlarının göründüğü test edilecek.
+4. Sistemin herhangi bir yerinde `super_admin` için "Bu işlemi yapma yetkiniz yok" hatasının **alınmadığından** tamamen emin olunacak.

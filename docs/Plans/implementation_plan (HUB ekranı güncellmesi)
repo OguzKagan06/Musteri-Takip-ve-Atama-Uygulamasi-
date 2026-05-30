@@ -1,0 +1,20 @@
+# Ana Ekran (Hub) İstatistik Kartı Temizleme Planı
+
+Ana ekrandaki sahte verilerle dolu "Sistem Yükü" istatistiğini tamamen kaldıracak ve geriye kalan dinamik "Aktif Kullanıcılar" kartının tasarımını derli toplu duracak şekilde sınırlandıracağız.
+
+## User Review Required
+
+Aşağıdaki HTML tasarım değişikliklerini lütfen inceleyip onaylayın.
+
+## Proposed Changes
+
+### app/templates/main/index.html
+Gereksiz kart div'i silinecek ve kapsayıcı (wrapper) yapısı tek bir karta uygun hale getirilecek.
+
+#### [MODIFY] app/templates/main/index.html
+*   **Silinecek Kısım:** Sayfa içerisindeki istatistiklerin yer aldığı Grid yapısının içinden, "Sistem Yükü" başlığını ve statik değeri (örn. %24) taşıyan `.glass-card` sınıfına sahip div bloğu (ve içindeki her şey) tamamen silinecek.
+*   **Düzenlenecek Kısım (Grid/Wrapper):** Eskiden iki kart olduğu için ekrana yayılacak şekilde tasarlanan (büyük ihtimalle `grid grid-cols-1 md:grid-cols-2` gibi bir yapı) kapsayıcı, artık sadece "Aktif Kullanıcılar" kartını barındıracağı için bu kartın çok uzayıp (stretch) çirkin durmasını engelleyeceğiz. Kapsayıcıya (veya direkt kalan kartın kendisine) `max-w-sm mx-auto` (veya tasarıma en uygun genişlik) sınıflarını vererek kartı merkezde, kibar ve kompakt bir formda tutacağız.
+
+## Verification Plan
+1. Ana sayfaya (Hub / `index.html`) gidildiğinde eski "Sistem Yükü" kartının ekranda olmadığı doğrulanacak.
+2. Geriye kalan "Aktif Kullanıcılar" kartının, geniş ekranda sağdan sola devasa şekilde uzayıp görsel yapıyı (Glassmorphism / Dark Tech) bozmadığı, derli toplu bir genişlikte (`max-w-sm` boyutlarında) durduğu teyit edilecek.

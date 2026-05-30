@@ -387,3 +387,15 @@ Ajan; dropdown içindeki paragraf etiketine Tailwind'in `line-clamp-2` ve `break
 
 ### Bu Oturumdan Öğrendiğim
 Frontend tarafında `line-clamp` gibi CSS/Tailwind özelliklerinin dinamik veri taşmalarını önlemedeki kritik rolünü ve bir web uygulamasında kullanıcı deneyimini (UX) iyileştirmek için verileri aşamalı olarak (önce özet/kırpılmış, sonra tam detay sayfası) göstermenin önemini kavradım.
+
+## Oturum 11 [31/05/2026]
+### Hedef
+Müşteri listesini dinamik sayfalama (pagination) ile yönetilebilir kılmak ve ana ekrandaki (Hub) statik, kalabalık istatistikleri temizleyerek sadece gerçek verileri yansıtmak.
+
+### Operasyon Adımları ve Öğrendiklerim
+1. **Dinamik Sayfalama (Pagination):** Dashboard tablosuna 5, 10, 20, 50 gibi dinamik limit belirleme linkleri eklendi. Backend tarafında URL'den `per_page` parametresi alınarak SQLAlchemy'nin `paginate` fonksiyonu dinamik hale getirildi. Sayfa numarası değiştiğinde URL parametrelerinin kaybolmaması için route yapısında optimizasyona gidildi.
+2. **Kayıt Sayısı Gösterimi:** Kullanıcının arama/filtreleme sonucu kaç veriyle çalıştığını görmesi için ekrana `customers.total` değişkeni kullanılarak toplam kayıt sayısı yazdırıldı.
+3. **UI/UX Temizliği:** Ana ekranda (Hub) kalabalık yaratan statik "Sistem Yükü" kartı kaldırılarak tasarım sadeleştirildi. Geriye kalan "Aktif Kullanıcı" kartının CSS esneklik özellikleriyle ekranı bozacak şekilde genişlemesini önlemek için Tailwind'in `max-w-sm` sınıfı gibi frontend mimari sınırlandırmaları kullanıldı.
+
+### Sonuç
+CRM sistemi artık sadece bir veri kayıt aracı değil, filtreleme yapabilen, gerçek zamanlı istatistik sunan ve kullanımı son derece rahat bir 'Command Center' haline geldi.

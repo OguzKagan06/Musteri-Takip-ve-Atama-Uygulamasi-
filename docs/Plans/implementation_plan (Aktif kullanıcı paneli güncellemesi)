@@ -1,0 +1,50 @@
+# Güvenli Kullanıcı Yönetimi ve Silme Planı
+
+Kullanıcı silme yetkisini tamamen güvenli bir hale getirerek, yalnızca yöneticilerin (admin) erişebileceği ve her silme işleminde kendi şifrelerini doğrulamaları gereken bir panel (Kullanıcı Yönetimi) oluşturacağız.
+
+## User Review Required
+
+Aşağıdaki veritabanı, form, rota ve arayüz güncellemelerini lütfen inceleyip onaylayın.
+
+## Proposed Changes
+
+### app/main/forms.py
+Admin şifresini doğrulayacak özel bir form eklenecek.
+
+#### [MODIFY] app/main/forms.py
+*   `AdminDeleteUserForm` adında yeni bir sınıf oluşturulacak.
+*   **Alanlar:**
+    *   `admin_password`: İşlemi onaylayacak yöneticinin kendi şifresi (`PasswordField`).
+    *   `submit`: "Kullanıcıyı Kalıcı Olarak Sil" butonu.
+
+### app/main/routes.py
+Kullanıcıları listelemek ve güvenle silmek için iki yeni rota tanımlanacak.
+
+#### [MODIFY] app/main/routes.py
+*   **`/admin/users` (GET):**
+    *   Sadece `current_user.role == 'admin'` yetkisine sahip kişilerin erişebileceği, tüm kayıtlı kullanıcıları (`User`) listeleyen ana tablo sayfası.
+*   **`/admin/users/delete/<int:user_id>` (POST):**
+    *   Yine sadece admin yetkisi arayan silme rotası.
+    *   Form üzerinden gelen `admin_password` değeri, aktif oturumdaki yöneticinin kendi şifresiyle (`current_user.check_password()`) karşılaştırılacak.
+    *   Eğer şifre **hatalıysa**, silme iptal edilip uyarı verilecek.
+    *   Eğer şifre **doğruysa**: Veritabanı bütünlüğünü korumak adına, o kullanıcının baktığı (`assigned_user_id`) ve son aradığı (`last_called_by_id`) tüm `Customer` kayıtları bulunup bu alanları geçici olarak `None` (veya boşa) atanacak. Ardından hedef kullanıcı tamamen silinip işlem onaylanacak (`db.session.commit()`).
+
+### app/templates/main/admin_users.html
+Yöneticiler için Dark Tech (Glassmorphism) temalı bir kullanıcı listesi sayfası tasarlanacak.
+
+#### [NEW] app/templates/main/admin_users.html
+*   Tüm kullanıcıların (Kullanıcı Adı, Rol vb.) göründüğü şık bir tablo.
+*   Her kullanıcının satırında (Adminin kendi satırı hariç) kırmızı bir "Sil" butonu bulunacak.
+*   **Alpine.js Entegrasyonu:** "Sil" butonuna basıldığında ekrana hemen bir onay penceresi (Modal) açılacak. Modal içerisinde adminin şifresini girmesi beklenecek ve form doğrudan `/admin/users/delete/<user_id>` POST rotasına gönderilecek.
+
+### app/templates/base.html
+Yeni panele erişim için sol menüye kısayol eklenecek.
+
+#### [MODIFY] app/templates/base.html
+*   Sol menüdeki `{% if current_user.role == 'admin' %}` bloğunun içerisine, `manage_accounts` ikonu eşliğinde "Kullanıcı Yönetimi" bağlantısı eklenecek. Bu link doğrudan `/admin/users` rotasına gidecek.
+
+## Verification Plan
+1. Admin yetkisiyle sisteme giriş yapılıp sol menüden "Kullanıcı Yönetimi" sekmesinin geldiği görülecek.
+2. Sayfaya girildiğinde test için açılmış bir arayıcı (User) hesabının yanındaki "Sil" butonuna basılacak.
+3. Açılan şık Alpine.js penceresine **yanlış** bir şifre girilip sistemin "Admin şifresi hatalı" diyerek güvenliği sağladığı test edilecek.
+4. Doğru şifre girilerek kullanıcının sistemden silindiği ve o arayıcıya ait olan müşterilerin "Sorumlu Arayıcı" sütunlarının "Atanmadı" (None) durumuna döndüğü doğrulanacak.

@@ -6,7 +6,7 @@
 {% block content %}
 <div class="flex justify-between items-center mb-6">
     <h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Müşteriler</h2>
-    {% if current_user.role == 'admin' %}
+    {% if current_user.role in ['admin', 'super_admin'] %}
     <a href="{{ url_for('crm.new_customer') }}" class="ruby-btn px-4 py-2 rounded-lg font-body-md text-body-md font-medium transition-colors flex items-center gap-2">
         <span class="material-symbols-outlined text-[18px]">person_add</span>
         Yeni Müşteri Ekle

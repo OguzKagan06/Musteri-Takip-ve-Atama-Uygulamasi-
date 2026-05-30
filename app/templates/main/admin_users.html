@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}Kullanıcı Yönetimi{% endblock %}
+{% block header_title %}Kullanıcı Yönetimi{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+    <h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Kullanıcı Listesi</h2>
+    <p class="text-on-surface-variant font-body-md mt-1">Sistemdeki tüm kullanıcıları görüntüleyin ve yönetin.</p>
+</div>
+
+<div class="glass-card rounded-xl overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="border-b border-white/10 bg-surface-container-low text-on-surface-variant font-label-md text-label-md uppercase tracking-wider">
+                    <th class="p-4">ID</th>
+                    <th class="p-4">Kullanıcı Adı</th>
+                    <th class="p-4">Rol</th>
+                    <th class="p-4 text-right">İşlemler</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-white/5">
+                {% for u in users %}
+                <tr class="hover:bg-primary/5 transition-colors group">
+                    <td class="p-4 text-on-surface-variant">#{{ u.id }}</td>
+                    <td class="p-4 text-on-surface font-medium flex items-center gap-3">
+                        <img src="{{ url_for('static', filename='avatars/' + u.avatar_file) }}" alt="{{ u.username }}" class="w-8 h-8 rounded-full border border-white/10 object-cover">
+                        {{ u.username }}
+                    </td>
+                    <td class="p-4">
+                        {% if u.role == 'super_admin' %}
+                            <span class="inline-block px-2 py-1 rounded-full bg-purple-500/20 text-purple-400 font-medium text-sm border border-purple-500/30">Kurucu</span>
+                        {% elif u.role == 'admin' %}
+                            <span class="inline-block px-2 py-1 rounded-full bg-primary/20 text-primary font-medium text-sm">Yönetici</span>
+                        {% else %}
+                            <span class="inline-block px-2 py-1 rounded-full bg-surface-variant text-on-surface-variant font-medium text-sm">Arayıcı</span>
+                        {% endif %}
+                    </td>
+                    <td class="p-4 text-right">
+                        {% if u.role == 'super_admin' %}
+                            <span class="text-purple-400/50 text-sm italic">Kurucu Silinemez</span>
+                        {% elif current_user.role == 'admin' and u.role == 'admin' and u.id != current_user.id %}
+                            <span class="text-on-surface-variant/50 text-sm italic">Yetkisiz</span>
+                        {% else %}
+                        <div x-data="{ open: false }" class="inline-block text-left">
+                            <button @click="open = true" class="inline-flex items-center gap-1 px-3 py-1 rounded bg-red-500/20 text-red-400 hover:bg-red-500/40 border border-red-500/50 transition-colors text-sm">
+                                <span class="material-symbols-outlined text-[16px]">delete</span>
+                                Sil
+                            </button>
+                            
+                            <!-- Delete Confirmation Modal -->
+                            <template x-teleport="body">
+                                <div x-show="open" style="display: none;" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm" x-transition.opacity>
+                                    <div @click.away="open = false" class="glass-card rounded-xl p-6 w-full max-w-md mx-4 shadow-2xl border border-red-500/30" x-transition.scale.origin.bottom>
+                                        <div class="flex items-center gap-3 mb-4 text-red-400">
+                                            <span class="material-symbols-outlined text-[32px]">warning</span>
+                                            <h3 class="font-headline-lg-mobile text-headline-lg-mobile">Kullanıcıyı Sil</h3>
+                                        </div>
+                                        <p class="text-on-surface-variant mb-6 text-left">
+                                            <strong class="text-on-surface">{{ u.username }}</strong> adlı kullanıcıyı kalıcı olarak silmek üzeresiniz. Bu işlem geri alınamaz. Lütfen işlemi onaylamak için kendi <strong>yönetici şifrenizi</strong> girin.
+                                        </p>
+                                        <form method="POST" action="{{ url_for('main.delete_user', user_id=u.id) }}" class="flex flex-col gap-4 text-left">
+                                            {{ form.hidden_tag() }}
+                                            <div>
+                                                {{ form.admin_password.label(class="block font-label-md text-label-md text-on-surface-variant mb-1") }}
+                                                {{ form.admin_password(class="w-full bg-surface-container-high border border-white/10 rounded-md p-2 text-white focus:border-red-500 focus:ring-1 focus:ring-red-500 focus:outline-none transition-colors", placeholder="Şifreniz") }}
+                                            </div>
+                                            <div class="flex justify-end gap-3 mt-4">
+                                                <button type="button" @click="open = false" class="px-4 py-2 rounded-lg font-body-md text-on-surface-variant hover:bg-surface-variant transition-colors">İptal</button>
+                                                {{ form.submit(class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-body-md cursor-pointer transition-colors shadow-lg shadow-red-500/20") }}
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" class="p-8 text-center text-on-surface-variant">Sistemde kayıtlı kullanıcı bulunamadı.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

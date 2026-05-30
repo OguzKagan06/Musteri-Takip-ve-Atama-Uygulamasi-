@@ -14,7 +14,7 @@ def dashboard():
     per_page = request.args.get('per_page', 5, type=int)
     query = db.select(Customer).order_by(Customer.id.desc())
     
-    if current_user.role != 'admin':
+    if current_user.role not in ['admin', 'super_admin']:
         query = query.where(Customer.assigned_user_id == current_user.id)
         
     if q:
@@ -31,7 +31,7 @@ def dashboard():
 @bp.route('/customer/new', methods=['GET', 'POST'])
 @login_required
 def new_customer():
-    if current_user.role != 'admin':
+    if current_user.role not in ['admin', 'super_admin']:
         flash('Bu sayfaya erişim yetkiniz yok.', 'danger')
         return redirect(url_for('crm.dashboard'))
         
@@ -74,7 +74,7 @@ def customer_detail(id):
         flash('Müşteri bulunamadı.', 'danger')
         return redirect(url_for('crm.dashboard'))
         
-    if current_user.role != 'admin' and customer.assigned_user_id != current_user.id:
+    if current_user.role not in ['admin', 'super_admin'] and customer.assigned_user_id != current_user.id:
         flash('Bu müşteriyi görüntüleme yetkiniz yok.', 'danger')
         return redirect(url_for('crm.dashboard'))
         
@@ -92,7 +92,7 @@ def customer_detail(id):
 @bp.route('/customer/<int:id>/delete', methods=['POST'])
 @login_required
 def delete_customer(id):
-    if current_user.role != 'admin':
+    if current_user.role not in ['admin', 'super_admin']:
         flash('Bu işlemi yapma yetkiniz yok.', 'danger')
         return redirect(url_for('crm.dashboard'))
         
@@ -114,13 +114,13 @@ def edit_customer(id):
         flash('Müşteri bulunamadı.', 'danger')
         return redirect(url_for('crm.dashboard'))
         
-    if current_user.role != 'admin' and customer.assigned_user_id != current_user.id:
+    if current_user.role not in ['admin', 'super_admin'] and customer.assigned_user_id != current_user.id:
         flash('Bu müşteriyi düzenleme yetkiniz yok.', 'danger')
         return redirect(url_for('crm.dashboard'))
         
     form = CustomerForm(obj=customer)
     
-    if current_user.role == 'admin':
+    if current_user.role in ['admin', 'super_admin']:
         users = db.session.scalars(db.select(User).where(User.role == 'arayıcı')).all()
         form.assigned_user_id.choices = [(u.id, u.username) for u in users]
         form.assigned_user_id.choices.insert(0, (0, 'Atanmadı'))
@@ -138,7 +138,7 @@ def edit_customer(id):
         customer.call_status = form.call_status.data
         customer.last_called_by_id = current_user.id
         
-        if current_user.role == 'admin':
+        if current_user.role in ['admin', 'super_admin']:
             assigned_id = form.assigned_user_id.data
             customer.assigned_user_id = assigned_id if assigned_id != 0 else None
             

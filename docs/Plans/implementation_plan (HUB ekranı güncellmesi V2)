@@ -1,0 +1,30 @@
+# Ana Portal (Hub) Dinamik Veri Entegrasyonu Planı
+
+Ana sayfamızdaki son kalan sahte (statik) istatistiği gerçek veritabanı verileriyle değiştireceğiz.
+
+## User Review Required
+
+Lütfen aşağıdaki backend (Python) ve frontend (HTML) entegrasyon adımlarını inceleyip onaylayın.
+
+## Proposed Changes
+
+### app/main/routes.py
+Anasayfa rotasında, ekrana basılacak gerçek veriyi hesaplayacağız.
+
+#### [MODIFY] app/main/routes.py
+*   Sayfanın başına (diğer importların arasına) `from app.models import Customer` importunu ekleyeceğiz.
+*   `/` (index) rotasında, kullanıcı giriş yapmışsa (`if current_user.is_authenticated:`) sayfayı render etmeden hemen önce SQLAlchemy 2.x stiliyle toplam müşteri sayısını hesaplayacağız: 
+    `total_customers = db.session.scalar(db.select(db.func.count(Customer.id)))`
+*   Elde ettiğimiz bu değişkeni `render_template('main/index.html', total_customers=total_customers)` şeklinde HTML şablonuna göndereceğiz.
+
+### app/templates/main/index.html
+Gelen veriyi ekrana yansıtacağız.
+
+#### [MODIFY] app/templates/main/index.html
+*   Geçen adımda düzenlediğimiz, sol üstte kalan tek karttaki (glass-card) **"Aktif Kullanıcı"** başlığını **"Aktif Müşteri"** olarak düzelteceğiz.
+*   Altındaki "1,204" isimli sahte (statik) rakamı tamamen silip yerine Jinja formatındaki `{{ total_customers }}` değişkenimizi yazacağız.
+
+## Verification Plan
+1. Sistemde giriş yapılmışken anasayfaya (Hub / Command Center) gidilecek.
+2. Sol üstteki kartta "Aktif Müşteri" başlığı ve altında veritabanındaki gerçek kayıt sayısının (Örneğin "12") yazdığı teyit edilecek.
+3. Yeni bir müşteri daha eklendiğinde (veya silindiğinde) bu sayının anında (sayfa yenilenince) 1 arttığı doğrulanacak.

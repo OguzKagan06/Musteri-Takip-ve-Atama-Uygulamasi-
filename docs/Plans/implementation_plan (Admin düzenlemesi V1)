@@ -1,0 +1,28 @@
+# Kullanıcı Listesi ve Modal Arayüzü İyileştirme Planı
+
+Kullanıcı yönetim sayfasında listelenen kullanıcıların "admin" (yönetici) yetkisine göre sıralanmasını ve Alpine.js onay penceresinin (modal) ekran içinde sıkışmasını çözmek için aşağıdaki planı hazırladım.
+
+## User Review Required
+
+Lütfen arayüz düzeltme ve sorgu (sıralama) güncelleme planını inceleyip onaylayın.
+
+## Proposed Changes
+
+### app/main/routes.py
+Yöneticilerin tabloda en üstte, normal kullanıcıların (arayıcıların) altta yer alması sağlanacak.
+
+#### [MODIFY] app/main/routes.py
+*   `/admin/users` rotasındaki kullanıcı çekme sorgusu güncellenecek.
+*   Şu anki `order_by(User.id)` yerine, kullanıcılar öncelikle Rollerine göre (Alfabetik olarak "admin" önde gelecek şekilde), ardından oluşturulma sırasına (ID) göre dizilecek: `db.select(User).order_by(User.role.asc(), User.id.asc())`. Bu sayede yöneticiler en başta listelenecek.
+
+### app/templates/main/admin_users.html
+Onay ekranı tablonun içinden kurtarılıp tüm ekranı kaplayacak şekilde serbest bırakılacak.
+
+#### [MODIFY] app/templates/main/admin_users.html
+*   Her satırda bulunan ve "Sil" butonuna tıklandığında açılan `x-show="open"` özellikli modal div'i, Alpine.js'in `<template x-teleport="body">` etiketi içerisine alınacak.
+*   `x-teleport` sayesinde modal, HTML kodunda nerede olursa olsun çalıştırıldığında doğrudan `<body>` etiketinin en dış katmanına ışınlanacak (render edilecek). Bu da tablonun "taştıkça gizle" (`overflow`) gibi CSS özelliklerinden etkilenmesini (sıkışmasını ve kesilmesini) tamamen önleyecek.
+*   Modal'ın z-index değeri yükseltilecek (`z-[100]`) ve ekranın tam ortasına (`fixed inset-0 flex items-center justify-center`) şık bir şekilde sabitlenmesi garanti altına alınacak.
+
+## Verification Plan
+1. `Kullanıcı Yönetimi` sayfasına girildiğinde yöneticilerin tablonun en tepesinde, normal arayıcıların altlarda yer aldığı görülecek.
+2. Bir arayıcı silinmek istendiğinde açılan onay ekranının (Modal) tablo içine hapsolmadan tüm sayfayı baştan başa kapladığı (arka planı kararttığı) ve temiz bir şekilde ekranda ortalandığı teyit edilecek.

@@ -1,0 +1,75 @@
+# RBAC (Yetkilendirme) ve CRM Modülü Planı
+
+Bu planda; güvenlik kuralları, roller bazında yetkilendirmeler, CRM dashboard'u ve müşteri notlarını yönetecek olan kısımların nasıl kodlanacağı belirtilmiştir.
+
+## User Review Required
+
+Lütfen özellikle yetkilendirme (RBAC) mantığını, müşteri atama koşullarını ve CLI komutunun yapısını inceleyin. Planda tüm sorgular belirttiğiniz gibi `SQLAlchemy 2.x` stili ile yapılmıştır. Onayınızdan sonra geliştirmeye başlayacağım.
+
+## Proposed Changes
+
+### 1. CLI (İlk Admini Oluşturma)
+
+#### [NEW] app/cli.py
+*   Yeni bir dosya oluşturulacak ve içine `flask create-admin` komutu tanımlanacak.
+*   Bu komut veritabanında `username='admin'` yoksa, şifresi `'123'` olan, rolü `'admin'` olan yeni bir kullanıcı (`User` modeli üzerinden `set_password` kullanılarak) oluşturacak.
+*   Bu komutu kaydetmek için `app/__init__.py` içerisine entegre edilecek.
+
+#### [MODIFY] app/__init__.py
+*   `app/cli.py` çağrılarak CLI komutları projeye dahil edilecek.
+
+---
+
+### 2. Güvenlik: app/auth/routes.py Güncellemesi
+
+#### [MODIFY] app/auth/routes.py
+*   `/register` rotası değiştirilerek `@login_required` eklenecek.
+*   Fonksiyonun başına `if current_user.role != 'admin':` kontrolü eklenecek. İhlal eden olursa `flash("Sadece yöneticiler yeni kullanıcı oluşturabilir.", "danger")` mesajıyla anasayfaya yönlendirilecek.
+
+---
+
+### 3. CRM Formları
+
+#### [NEW] app/crm/forms.py
+*   `CustomerForm`: Müşteri bilgilerini almak için (referans, ad, soyad, doğum tarihi, vb.) oluşturulacak. Ek olarak `assigned_user_id` adında bir `SelectField` eklenecek. Bu alanın seçenekleri dinamik olarak veritabanındaki arayıcılardan (`User` modeli üzerinden) rotada (`routes.py` içinde) doldurulacak.
+*   `NoteForm`: Müşteri detayı sayfasında kullanılmak üzere, sadece `content` (TextAreaField) barındıran bir form oluşturulacak.
+
+---
+
+### 4. CRM Rotaları (Routes)
+
+#### [MODIFY] app/crm/routes.py
+*   Tüm rotalar `@login_required` ile korunacak.
+*   `/dashboard`: 
+    *   Eğer `current_user.role == 'admin'` ise: `db.session.scalars(db.select(Customer)).all()` ile tüm müşterileri döndürecek.
+    *   Değilse: `db.session.scalars(db.select(Customer).where(Customer.assigned_user_id == current_user.id)).all()` ile sadece arayıcının kendi müşterilerini döndürecek.
+*   `/customer/new` (Yeni Müşteri):
+    *   Formdaki `assigned_user_id` selectbox'ı, `User` modelinden (rolü arayıcı olanlar) çekilen verilerle dinamik doldurulacak.
+    *   Eğer admin müşteri ekliyorsa: Formdan gelen `assigned_user_id` geçerli sayılacak.
+    *   Eğer arayıcı ekliyorsa: Formdan gelen atama yok sayılacak ve `customer.assigned_user_id = current_user.id` şeklinde zorunlu atama yapılacak.
+*   `/customer/<int:id>` (Müşteri Detayı):
+    *   Eğer arayıcı başka bir arayıcının müşterisine girmeye çalışırsa (`customer.assigned_user_id != current_user.id` ve `current_user.role != 'admin'`), erişim engellenecek ve dashboard'a `flash` ile yönlendirilecek.
+    *   Sayfa yüklendiğinde, o müşteriye ait notlar `db.select(Note)` ile çekilecek. Aynı sayfada `NoteForm` gönderildiğinde yeni not oluşturulacak.
+
+---
+
+### 5. Görüntüler ve Tasarım (Templates)
+
+#### [MODIFY] app/templates/base.html
+*   Navbar güncellenecek: `Dashboard` linki giriş yapan herkese görünecek.
+*   `Kayıt Ol` butonu kaldırılarak, sadece admin olanlara görünen bir `Kullanıcı Ekle` linkine dönüştürülecek. Giriş yapmayanlar sadece `Giriş Yap` linkini görecek.
+
+#### [NEW] app/templates/crm/dashboard.html
+*   Bootstrap 5 Tablosu (Table) kullanılarak müşteriler listelenecek. Tabloda "Detay" butonu bulunacak. Sayfada bir "Yeni Müşteri Ekle" butonu da yer alacak.
+
+#### [NEW] app/templates/crm/add_customer.html
+*   Müşteri eklemek için form render edilecek. Formda "Atanacak Arayıcı" alanı sadece `admin` rolündeki kişilere gösterilecek, sıradan arayıcılar o alanı göremeyecek (Jinja ile koşul).
+
+#### [NEW] app/templates/crm/customer_detail.html
+*   Sol tarafta müşteri bilgileri (kart), sağ veya alt tarafta görüşme notları geçmişi (list-group) listelenecek.
+*   Alt kısımda yeni not eklemek için `NoteForm` bulunacak. Tüm tasarım Bootstrap 5 ile mobil uyumlu dizayn edilecek.
+
+## Verification Plan
+1. `flask create-admin` CLI komutu ile veritabanında test amaçlı admin oluşturulacak.
+2. Formlar üzerinden yeni müşteri kaydı ve not kaydı gibi işlevler, `SQLAlchemy 2.x` metodları ile test edilecek.
+3. Yetkisiz arayıcıların başka müşteri profiline girip giremediği (RBAC mantığı) doğrulanacak.

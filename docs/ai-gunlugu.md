@@ -68,3 +68,43 @@ Vibe coding sürecinde ajana bağlamı (context) ve kısıtları (constraints) n
 ### Karşılaştığım Hatalar ve Çözümler
 - **Hata:** Terminalde `flask db init` komutunu çalıştırdığımda `Error: No such command 'db'` hatası aldım.
 - **Çözüm:** Hatanın nedenini analiz ettiğimde, iskelet kurulumunda `app/__init__.py` dosyasının boş bırakıldığını ve Flask-Migrate eklentisinin uygulamaya tanıtılmadığını fark ettim. Ajana, `config.py` içine veritabanı URI'sini eklemesi ve `__init__.py` içinde `db.init_app(app)` ile `migrate.init_app(app, db)` yapılandırmalarını kurması için yeni bir görev (prompt) verdim. Ayrıca `.env` dosyasında `FLASK_APP=run.py` tanımlamasını yaparak Flask'a uygulamanın giriş yolunu gösterdim. Düzeltmelerden sonra migrasyon komutları sorunsuz çalıştı.
+
+## Oturum 3 [30/05/2026]
+### Hedef
+Kullanıcıların sisteme güvenle kayıt olabilmesi ve giriş yapabilmesi için Flask-Login ve Flask-WTF kullanarak Auth akışının kurulması.
+
+### Verdiğim Promptlar
+1. Bağlam: Veritabanı modelleri hazır, app/auth/ blueprint'i kuruldu ancak içi boş.
+
+Hedef: Tam çalışan güvenli bir kayıt (register) ile giriş/çıkış (login/logout) akışı kur.
+
+Adımlar:
+1. app/models.py: `User` modeline Flask-Login'in `UserMixin` sınıfını kalıtım olarak ekle. Ayrıca `user_loader` fonksiyonunu yaz.
+2. app/auth/forms.py: `RegisterForm` ve `LoginForm` oluştur. (Flask-WTF ve gerekli validator'ler dahil edilsin).
+3. app/auth/routes.py: `/register`, `/login`, `/logout` rotalarını yaz.
+4. app/templates/auth/register.html ve login.html: Bu sayfaları Bootstrap 5 kullanarak, mobil uyumlu ve temiz bir tasarımla oluştur. Form elemanlarını Jinja ile render et.
+5. app/__init__.py: Flask-Login'i yapılandır (login_manager nesnesini oluştur, init_app ile bağla ve login_view = 'auth.login' olarak ayarla).
+6. app/templates/base.html: Navbar (üst menü) kısmına kullanıcı giriş yapmamışsa "Giriş Yap" / "Kayıt Ol", giriş yapmışsa "Çıkış Yap" bağlantılarını koşullu (if current_user.is_authenticated) olarak ekle.
+
+Kısıtlar:
+- Kayıt (Register) ekranında 'username'in daha önce alınıp alınmadığını veritabanından kontrol et (Custom validator).
+- Kullanıcı zaten giriş yapmışsa ve /login veya /register sayfasına girmeye çalışırsa anasayfaya yönlendir.
+- Başarılı/başarısız girişler için flash() mesajlarını tamamen Türkçe kullan.
+- CSRF korumasını asla atlama (form.hidden_tag() kullan).
+- Plan modunda ilerle. Önce değiştireceğin/oluşturacağın dosyaların planını göster, onayımı bekle.
+
+### Ajanın Önerdiği Plan
+Ajan, `UserMixin` kalıtımını, `User_loader` fonksiyonunu ve CSRF korumalı formları içeren detaylı bir plan sundu. Formlarda Bootstrap 5 kullanmayı planladı. [Kayıt Sayfası](docs/img/kayıt-sayfası.png)
+
+### Plan'da Sorguladıklarım
+Plan, projenin güvenlik kısıtlarını (şifre hashleme, eşsiz kullanıcı adı kontrolü, CSRF) ve UI kısıtlarını (Türkçe flash mesajları) tam olarak karşıladığı için doğrudan onay verdim.
+
+### Bu Oturumdan Öğrendiğim
+Kimlik doğrulama gibi karmaşık ve birden fazla dosyaya dokunan (models, routes, forms, templates, init) görevlerde, ajana adım adım hangi dosyalara ne eklemesi gerektiğini söylemek, sürecin hatasız ve tek seferde tamamlanmasını sağlıyor.
+
+### Karşılaştığım Hatalar ve Çözümler
+- **Hata 1:** Kayıt formunu doldurup gönderdiğimde `OperationalError: no such table: users` hatası ile karşılaştım. [Kayıt Hatası](docs/img/kayıt-hatası.png)
+- **Çözüm 1:** Sorunun, tabloları fiziksel olarak yaratan `flask db upgrade` komutunun eksik kalmasından kaynaklandığını tespit ettim.
+- **Hata 2:** `flask db upgrade` komutunu çalıştırdığımda bu kez `ImportError: Can't find Python file migrations\env.py` hatası aldım.
+- **Çözüm 2:** Ajanın ilk iskelet kurulumunda oluşturduğu boş `migrations` klasörünün Flask-Migrate altyapısını bozduğunu fark ettim. Manuel olarak bu boş klasörü sildim ve `flask db init`, `migrate`, `upgrade` komutlarını sıfırdan, temiz bir şekilde çalıştırarak tabloları başarıyla oluşturdum.
+[migrates](docs/img/migrates.png)

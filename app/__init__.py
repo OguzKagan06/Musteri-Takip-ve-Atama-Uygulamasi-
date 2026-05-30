@@ -23,6 +23,9 @@ def create_app(config_class=Config):
     with app.app_context():
         from app import models
 
+    from app.cli import register_cli_commands
+    register_cli_commands(app)
+
     # Register blueprints
     from app.main import bp as main_bp
     app.register_blueprint(main_bp)

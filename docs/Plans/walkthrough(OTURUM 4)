@@ -1,0 +1,30 @@
+# RBAC ve CRM Modülü Uygulama Özeti
+
+Onayladığınız plana istinaden projeye Rol Bazlı Yetkilendirme (RBAC) sistemi ve uygulamanın çekirdeği olan CRM modülü başarıyla eklenmiştir.
+
+## Yapılan Değişiklikler
+
+*   **1. CLI Komutu (İlk Admin Kurulumu)**
+    *   `app/cli.py` dosyası oluşturuldu ve içine `flask create-admin` komutu yazıldı. Bu komut terminal üzerinden çalıştırılarak (`flask create-admin`) sisteme varsayılan `admin` kullanıcısını ekleyebilmektedir.
+    *   Komutlar `app/__init__.py` içinde Flask uygulamasına başarıyla kaydedildi.
+
+*   **2. Yetkilendirme (RBAC) Yapılandırması**
+    *   `/register` rotası (`app/auth/routes.py`) `@login_required` ile korunmaya alındı.
+    *   İçerisine eklenen koşul ile sadece rolü `admin` olanların bu sayfayı görebilmesi, yetkisiz kullanıcıların anasayfaya yönlendirilip engellenmesi sağlandı.
+    *   Navbar'daki "Kayıt Ol" butonu yerine, sadece adminlere görünen "Kullanıcı Ekle" bağlantısı oluşturuldu.
+
+*   **3. CRM Rotaları ve Formlar**
+    *   **Dashboard:** Adminler tüm müşterileri görebiliyorken, arayıcılar sadece kendi (`assigned_user_id`) ID'leriyle eşleşen müşterileri tablo üzerinde görüntüleyebilmektedir.
+    *   **Yeni Müşteri (app/crm/forms.py):** `CustomerForm` kullanılarak müşteri eklenebilir. Arayıcıların sistemden (`User` modeli) çekilerek SelectBox'a doldurulması dinamik hale getirildi. Arayıcıların kendi atamalarını değiştirememesi adına mecburi ID kilitleri koda (`app/crm/routes.py`) dahil edildi.
+    *   **Müşteri Detayı:** Yetki sınırlarını aşarak başkasının müşterisine girmeye çalışan arayıcılar engellendi. Bu sayfada eski notlar (görüşme geçmişi) en yeniden eskiye sıralanırken, yeni not girmek için `NoteForm` aktif hale getirildi.
+
+*   **4. Şık Arayüz (Templates)**
+    *   `app/templates/crm/` dizininde `dashboard.html`, `add_customer.html` ve `customer_detail.html` dosyaları oluşturuldu.
+    *   Tüm dosyalar Bootstrap 5 kart yapısında mobil uyumlu tasarlandı, Türkçe karakter standartlarına ve form yapısına uyumlu render yapıldı.
+
+## Test ve Doğrulama
+Kodların `python -m py_compile` aracı ile sözdizimi doğrulamaları yapılmış olup, her dosyanın derlenebildiği hatasız bir şekilde kanıtlanmıştır.
+
+Terminalinize giderek veritabanında ilk admin hesabınızı oluşturmak için:
+`flask create-admin` 
+komutunu kullanabilirsiniz. Ardından `flask run` ile giriş yaparak yetki seviyelerini deneyimleyebilirsiniz.

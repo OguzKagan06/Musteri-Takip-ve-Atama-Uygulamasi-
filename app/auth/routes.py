@@ -28,8 +28,10 @@ def logout():
     return redirect(url_for('main.index'))
 
 @bp.route('/register', methods=['GET', 'POST'])
+@login_required
 def register():
-    if current_user.is_authenticated:
+    if current_user.role != 'admin':
+        flash('Sadece yöneticiler yeni kullanıcı oluşturabilir.', 'danger')
         return redirect(url_for('main.index'))
     form = RegisterForm()
     if form.validate_on_submit():

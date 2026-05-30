@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}Müşteri Detayı{% endblock %}
+
+{% block content %}
+<div class="mb-4 mt-3">
+    <a href="{{ url_for('crm.dashboard') }}" class="text-decoration-none">&larr; Dashboard'a Dön</a>
+</div>
+
+<div class="row">
+    <!-- Sol Taraf: Müşteri Bilgileri -->
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0 py-1">{{ customer.name }} {{ customer.surname }}</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between px-0">
+                        <span class="text-muted">Referans</span>
+                        <strong>{{ customer.reference or '-' }}</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between px-0">
+                        <span class="text-muted">Telefon</span>
+                        <strong>{{ customer.phone or '-' }}</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between px-0">
+                        <span class="text-muted">İlçe</span>
+                        <strong>{{ customer.district or '-' }}</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between px-0">
+                        <span class="text-muted">Meslek</span>
+                        <strong>{{ customer.profession or '-' }}</strong>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between px-0">
+                        <span class="text-muted">Doğum Tarihi</span>
+                        <strong>{{ customer.birth_date or '-' }}</strong>
+                    </li>
+                </ul>
+                <div class="mt-4 pt-3 border-top">
+                    <small class="text-muted">Sorumlu Arayıcı: </small>
+                    <span class="badge bg-secondary">{{ customer.assigned_user.username if customer.assigned_user else 'Atanmadı' }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sağ Taraf: Notlar -->
+    <div class="col-md-8">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0 py-1">Yeni Not Ekle</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="">
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ form.content(class="form-control", rows="3", placeholder="Müşteri görüşmesiyle ilgili detayları buraya yazın...") }}
+                    </div>
+                    <div class="text-end">
+                        {{ form.submit(class="btn btn-primary") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <h5 class="mb-3">Görüşme Geçmişi</h5>
+        {% if notes %}
+            <div class="list-group shadow-sm">
+                {% for note in notes %}
+                <div class="list-group-item list-group-item-action p-3">
+                    <div class="d-flex w-100 justify-content-between mb-2">
+                        <h6 class="mb-0 fw-bold">{{ note.user.username }}</h6>
+                        <small class="text-muted">{{ note.created_at.strftime('%d.%m.%Y %H:%M') }}</small>
+                    </div>
+                    <p class="mb-0">{{ note.content }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-light text-center border text-muted">
+                Henüz bir görüşme notu eklenmemiş.
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

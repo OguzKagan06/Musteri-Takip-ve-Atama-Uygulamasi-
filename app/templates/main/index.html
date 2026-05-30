@@ -1,57 +1,122 @@
 {% extends "base.html" %}
 
 {% block title %}Ana Portal{% endblock %}
+{% block header_title %}Command Center{% endblock %}
 
 {% block content %}
-<div class="row mt-4 mb-4">
-    <div class="col-12 text-center">
-        <h2 class="fw-bold">Cyber Gate CRM'e Hoş Geldiniz</h2>
-        <p class="text-muted fs-5">Lütfen işlem yapmak istediğiniz modülü seçiniz.</p>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+    <div class="glass-card rounded-xl p-4 flex flex-col gap-1">
+        <span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Aktif Kullanıcı</span>
+        <span class="font-display-lg text-display-lg text-on-surface">1,204</span>
+    </div>
+    <div class="glass-card rounded-xl p-4 flex flex-col gap-1">
+        <span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Sistem Yükü</span>
+        <span class="font-display-lg text-display-lg text-on-surface">24%</span>
     </div>
 </div>
 
-<div class="row justify-content-center g-4">
-    <!-- Aktif Modül: CRM -->
-    <div class="col-md-6 col-lg-3">
-        <div class="card h-100 shadow border-primary" style="transition: transform 0.2s;">
-            <div class="card-body text-center d-flex flex-column justify-content-center py-5">
-                <h4 class="card-title text-primary mb-4">Müşteri Yönetimi<br>(CRM)</h4>
-                <a href="{{ url_for('crm.dashboard') }}" class="btn btn-primary btn-lg mt-auto">Modüle Git</a>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- Module 1: Müşteri Yönetimi -->
+    <article class="glass-card rounded-xl p-6 flex flex-col gap-4 group hover:-translate-y-1 transition-transform duration-300">
+        <div class="flex justify-between items-start">
+            <div class="w-12 h-12 rounded-lg bg-surface-variant/50 border border-white/10 flex items-center justify-center text-primary group-hover:bg-primary/10 transition-colors">
+                <span class="material-symbols-outlined text-[24px]">group</span>
             </div>
         </div>
-    </div>
+        <div>
+            <h3 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-2">Müşteri Yönetimi</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant line-clamp-2">Müşteri verilerini ve ilişkilerini yönetin.</p>
+        </div>
+        <div class="mt-auto pt-4">
+            <a href="{{ url_for('crm.dashboard') }}" class="ruby-btn block text-center w-full py-2 rounded-lg font-body-md text-body-md font-medium transition-colors">
+                Modüle Git
+            </a>
+        </div>
+    </article>
 
-    <!-- Pasif Modül: Gelişmiş Raporlar -->
-    <div class="col-md-6 col-lg-3">
-        <div class="card h-100 shadow-sm bg-light position-relative">
-            <div class="card-body text-center d-flex flex-column justify-content-center py-5">
-                <span class="badge bg-secondary position-absolute top-0 start-50 translate-middle mt-2">Çok Yakında</span>
-                <h4 class="card-title text-muted mb-4">Gelişmiş<br>Raporlar</h4>
-                <button class="btn btn-secondary btn-lg mt-auto" disabled>Modüle Git</button>
+    <!-- Module 2: Gelişmiş Raporlar -->
+    <article class="glass-card rounded-xl p-6 flex flex-col gap-4 group hover:-translate-y-1 transition-transform duration-300 relative">
+        <div class="flex justify-between items-start">
+            <div class="w-12 h-12 rounded-lg bg-surface-variant/50 border border-white/10 flex items-center justify-center text-primary group-hover:bg-primary/10 transition-colors">
+                <span class="material-symbols-outlined text-[24px]">analytics</span>
             </div>
+            <span class="coming-soon-badge font-label-md text-label-md px-2 py-1 rounded">Çok Yakında</span>
         </div>
-    </div>
+        <div>
+            <h3 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-2">Gelişmiş Raporlar</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant line-clamp-2">Detaylı analizler ve performans raporları.</p>
+        </div>
+        <div class="mt-auto pt-4">
+            <button class="w-full py-2 rounded-lg font-body-md text-body-md font-medium border border-white/10 text-on-surface-variant/50 cursor-not-allowed" disabled>Modüle Git</button>
+        </div>
+    </article>
 
-    <!-- Pasif Modül: Takvim & Görevler -->
-    <div class="col-md-6 col-lg-3">
-        <div class="card h-100 shadow-sm bg-light position-relative">
-            <div class="card-body text-center d-flex flex-column justify-content-center py-5">
-                <span class="badge bg-secondary position-absolute top-0 start-50 translate-middle mt-2">Çok Yakında</span>
-                <h4 class="card-title text-muted mb-4">Takvim &<br>Görevler</h4>
-                <button class="btn btn-secondary btn-lg mt-auto" disabled>Modüle Git</button>
+    <!-- Module 3: Takvim & Görevler -->
+    <article class="glass-card rounded-xl p-6 flex flex-col gap-4 group hover:-translate-y-1 transition-transform duration-300 relative">
+        <div class="flex justify-between items-start">
+            <div class="w-12 h-12 rounded-lg bg-surface-variant/50 border border-white/10 flex items-center justify-center text-primary group-hover:bg-primary/10 transition-colors">
+                <span class="material-symbols-outlined text-[24px]">calendar_today</span>
             </div>
+            <span class="coming-soon-badge font-label-md text-label-md px-2 py-1 rounded">Çok Yakında</span>
         </div>
-    </div>
+        <div>
+            <h3 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-2">Takvim & Görevler</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant line-clamp-2">Ekip görevlerini ve önemli tarihleri takip edin.</p>
+        </div>
+        <div class="mt-auto pt-4">
+            <button class="w-full py-2 rounded-lg font-body-md text-body-md font-medium border border-white/10 text-on-surface-variant/50 cursor-not-allowed" disabled>Modüle Git</button>
+        </div>
+    </article>
 
-    <!-- Pasif Modül: Kullanıcı İstatistikleri -->
-    <div class="col-md-6 col-lg-3">
-        <div class="card h-100 shadow-sm bg-light position-relative">
-            <div class="card-body text-center d-flex flex-column justify-content-center py-5">
-                <span class="badge bg-secondary position-absolute top-0 start-50 translate-middle mt-2">Çok Yakında</span>
-                <h4 class="card-title text-muted mb-4">Kullanıcı<br>İstatistikleri</h4>
-                <button class="btn btn-secondary btn-lg mt-auto" disabled>Modüle Git</button>
+    <!-- Module 4: Kullanıcı İstatistikleri -->
+    <article class="glass-card rounded-xl p-6 flex flex-col gap-4 group hover:-translate-y-1 transition-transform duration-300 relative">
+        <div class="flex justify-between items-start">
+            <div class="w-12 h-12 rounded-lg bg-surface-variant/50 border border-white/10 flex items-center justify-center text-primary group-hover:bg-primary/10 transition-colors">
+                <span class="material-symbols-outlined text-[24px]">query_stats</span>
             </div>
+            <span class="coming-soon-badge font-label-md text-label-md px-2 py-1 rounded">Çok Yakında</span>
         </div>
-    </div>
+        <div>
+            <h3 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-2">Kullanıcı İstatistikleri</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant line-clamp-2">Kullanıcı etkileşimi ve sistem verileri.</p>
+        </div>
+        <div class="mt-auto pt-4">
+            <button class="w-full py-2 rounded-lg font-body-md text-body-md font-medium border border-white/10 text-on-surface-variant/50 cursor-not-allowed" disabled>Modüle Git</button>
+        </div>
+    </article>
+
+    <!-- Module 5: Siber Güvenlik Paneli (Coming Soon) -->
+    <article class="glass-card rounded-xl p-6 flex flex-col gap-4 opacity-80 border-dashed border-white/10 relative">
+        <div class="flex justify-between items-start">
+            <div class="w-12 h-12 rounded-lg bg-surface-container/50 border border-white/5 flex items-center justify-center text-on-surface-variant">
+                <span class="material-symbols-outlined text-[24px]">security</span>
+            </div>
+            <span class="coming-soon-badge font-label-md text-label-md px-2 py-1 rounded">Çok Yakında</span>
+        </div>
+        <div>
+            <h3 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface-variant mb-2">Siber Güvenlik Paneli</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant/70 line-clamp-2">Gerçek zamanlı tehdit izleme ve güvenlik duvarı.</p>
+        </div>
+        <div class="mt-auto pt-4">
+            <button class="w-full py-2 rounded-lg font-body-md text-body-md font-medium border border-white/5 text-on-surface-variant/50 cursor-not-allowed" disabled>Modüle Git</button>
+        </div>
+    </article>
+
+    <!-- Module 6: Otomasyon Merkezi (Coming Soon) -->
+    <article class="glass-card rounded-xl p-6 flex flex-col gap-4 opacity-80 border-dashed border-white/10 relative">
+        <div class="flex justify-between items-start">
+            <div class="w-12 h-12 rounded-lg bg-surface-container/50 border border-white/5 flex items-center justify-center text-on-surface-variant">
+                <span class="material-symbols-outlined text-[24px]">smart_toy</span>
+            </div>
+            <span class="coming-soon-badge font-label-md text-label-md px-2 py-1 rounded">Çok Yakında</span>
+        </div>
+        <div>
+            <h3 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface-variant mb-2">Otomasyon Merkezi</h3>
+            <p class="font-body-md text-body-md text-on-surface-variant/70 line-clamp-2">Yapay zeka destekli iş akışı otomasyonu.</p>
+        </div>
+        <div class="mt-auto pt-4">
+            <button class="w-full py-2 rounded-lg font-body-md text-body-md font-medium border border-white/5 text-on-surface-variant/50 cursor-not-allowed" disabled>Modüle Git</button>
+        </div>
+    </article>
 </div>
 {% endblock %}

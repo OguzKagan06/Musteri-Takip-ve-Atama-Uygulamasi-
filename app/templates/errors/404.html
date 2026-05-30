@@ -1,16 +1,18 @@
 {% extends "base.html" %}
 
-{% block title %}Sayfa Bulunamadı{% endblock %}
+{% block title %}404 - Sayfa Bulunamadı{% endblock %}
+{% block header_title %}Hata 404{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center mt-5">
-    <div class="col-md-6 text-center">
-        <h1 class="display-1 fw-bold text-primary">404</h1>
-        <p class="fs-3"><span class="text-danger">Opps!</span> Sayfa bulunamadı.</p>
-        <p class="lead">
+<div class="flex justify-center items-center h-[60vh]">
+    <div class="glass-card rounded-xl p-12 text-center max-w-lg w-full border-dashed border-primary/30">
+        <span class="material-symbols-outlined text-[80px] text-primary mb-4 opacity-80">error</span>
+        <h1 class="font-display-lg text-display-lg text-primary mb-2">404</h1>
+        <p class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-4">Sistem dışı erişim engellendi.</p>
+        <p class="font-body-md text-body-md text-on-surface-variant mb-8">
             Aradığınız sayfa silinmiş veya adresi yanlış yazılmış olabilir.
         </p>
-        <a href="{{ url_for('main.index') }}" class="btn btn-primary mt-3">Anasayfaya Dön</a>
+        <a href="{{ url_for('main.index') }}" class="ruby-btn px-8 py-3 rounded-lg font-body-md text-body-md font-medium transition-colors inline-block">Anasayfaya Dön</a>
     </div>
 </div>
 {% endblock %}

@@ -257,3 +257,35 @@ Ajan; Dashboard sorgularını `db.paginate()` fonksiyonuyla güncelleyerek sayfa
 
 ### Bu Oturumdan Öğrendiğim
 Büyük veri setlerini `paginate` ile yönetmenin uygulamanın hızını ve kararlılığını ne kadar etkilediğini, ayrıca bir yazılımda hata yönetiminin (error handling) sadece hata yakalamak değil, kullanıcıya dostça ve yönlendirici bir arayüz sunmak olduğunu kavradım.
+
+## Oturum 8 [30/05/2026]
+### Hedef
+Kullanıcıyı doğrudan veri listelerine boğmak yerine, ileride eklenebilecek yeni özellikleri (Raporlar, Takvim vb.) barındıran şık bir Ana Portal (Hub) oluşturmak ve kurumsal kimlik için global bir Footer entegre etmek.
+
+### Verdiğim Promptlar
+Bağlam: Uygulamamızın CRM, Auth ve Main (Ana) modül altyapıları hazır. Şimdi kullanıcıyı karşılayacak şık bir ana portal (Hub) ekranı tasarlamak ve genel tasarıma bir alt bilgi (footer) eklemek istiyoruz.
+
+Hedef: Giriş yapan kullanıcıları modüllerin listelendiği bir ana sayfada karşıla ve tüm sayfalarda görünecek bir footer ekle.
+
+Adımlar:
+1. app/main/routes.py: Anasayfa `/` rotasını güncelle. 
+   - Eğer kullanıcı giriş yapmamışsa, onu yine `auth.login` sayfasına yönlendir veya şık bir "Hoş Geldiniz, lütfen giriş yapın" ekranı render et.
+   - Eğer kullanıcı giriş yapmışsa, doğrudan CRM dashboard'una YÖNLENDİRME. Bunun yerine `main/index.html` sayfasını render et.
+2. app/templates/main/index.html: 
+   - Bootstrap 5 Grid (Card) yapısını kullanarak bir "Modüller" ekranı tasarla.
+   - 1. Kart: "Müşteri Yönetimi (CRM)" -> Butonu `crm.dashboard` rotasına gitsin. Rengi canlı ve aktif olsun.
+   - 2, 3 ve 4. Kartlar: Sırasıyla "Gelişmiş Raporlar", "Takvim & Görevler" ve "Kullanıcı İstatistikleri" adında olsun. Butonları disabled (tıklanamaz) olsun ve üzerlerinde şık bir Bootstrap rozetiyle (Badge) "Çok Yakında" yazsın.
+3. app/templates/base.html (Footer Entegrasyonu):
+   - Sayfa yapısının altına (içeriği itmeyen, sayfa kısaysa en altta duran `mt-auto` yapısıyla) bir `<footer>` ekle.
+   - Footer içeriği: "Copyright &copy; 2026 Cyber Gate CRM - Tüm hakları saklıdır." şeklinde profesyonel ve ortalanmış bir metin olsun. Sayfanın genel `body` class'ına `d-flex flex-column min-vh-100` eklemeyi unutma ki footer her zaman en altta kalsın.
+   - Navbar'daki marka (Brand) ismine tıklanınca `main.index` (Anasayfa) rotasına gitsin.
+
+Kısıtlar:
+- Plan modunda ilerle ve onayımı bekle.
+- Arayüz tamamen Türkçe, şık ve Bootstrap 5'in modern componentleriyle (Card, Badge) tasarlanmalı.
+
+### Ajanın Önerdiği Plan
+Ajan, `/` rotasını güncelleyerek giriş yapan kullanıcıları doğrudan CRM listesi yerine `main/index.html` portalına yönlendirdi. Bootstrap 5 Grid ve Card yapılarıyla modülleri tasarladı, pasif modüllere "Çok Yakında" rozetleri ekledi. Footer'ın her zaman en altta durması için `<body>` etiketine `min-vh-100` flexbox sınıflarını uyguladı.
+
+### Bu Oturumdan Öğrendiğim
+Geniş çaplı uygulamalarda (ERP/CRM) kullanıcıyı bir "Hub" ekranında karşılamanın kullanıcı deneyimi (UX) açısından çok daha profesyonel olduğunu gördüm. Ayrıca CSS/Bootstrap flexbox mimarisinin sayfa düzenini sağlama konusundaki gücünü (sticky footer) pratik bir şekilde deneyimledim.

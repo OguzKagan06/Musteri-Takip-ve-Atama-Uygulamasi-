@@ -1,92 +1,108 @@
 {% extends 'base.html' %}
 
 {% block title %}Müşteri Detayı{% endblock %}
+{% block header_title %}Müşteri Detayı{% endblock %}
 
 {% block content %}
-<div class="mb-4 mt-3">
-    <a href="{{ url_for('crm.dashboard') }}" class="text-decoration-none">&larr; Dashboard'a Dön</a>
+<div class="mb-6">
+    <a href="{{ url_for('crm.dashboard') }}" class="text-on-surface-variant hover:text-primary transition-colors flex items-center gap-2 w-fit">
+        <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+        Dashboard'a Dön
+    </a>
 </div>
 
-<div class="row">
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <!-- Sol Taraf: Müşteri Bilgileri -->
-    <div class="col-md-4 mb-4">
-        <div class="card shadow-sm h-100">
-            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                <h5 class="mb-0 py-1">{{ customer.name }} {{ customer.surname }}</h5>
+    <div class="lg:col-span-1">
+        <div class="glass-card rounded-xl overflow-hidden h-full flex flex-col">
+            <div class="bg-primary/10 border-b border-primary/20 p-4 flex justify-between items-center">
+                <h5 class="font-headline-lg-mobile text-headline-lg-mobile text-primary">{{ customer.name }} {{ customer.surname }}</h5>
                 {% if current_user.role == 'admin' %}
                 <form method="POST" action="{{ url_for('crm.delete_customer', id=customer.id) }}" onsubmit="return confirm('Bu müşteriyi tamamen silmek istediğinize emin misiniz? Müşteriye ait tüm notlar da silinecektir!');" class="m-0 p-0">
-                    <button type="submit" class="btn btn-sm btn-danger">Müşteri Sil</button>
+                    <button type="submit" class="bg-red-500/20 text-red-400 hover:bg-red-500/40 border border-red-500/50 px-3 py-1 rounded transition-colors text-sm flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[16px]">delete</span>
+                        Sil
+                    </button>
                 </form>
                 {% endif %}
             </div>
-            <div class="card-body">
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item d-flex justify-content-between px-0">
-                        <span class="text-muted">Referans</span>
-                        <strong>{{ customer.reference or '-' }}</strong>
+            <div class="p-4 flex-grow">
+                <ul class="flex flex-col divide-y divide-white/5">
+                    <li class="py-3 flex justify-between items-center">
+                        <span class="text-on-surface-variant font-label-md text-label-md uppercase">Referans</span>
+                        <strong class="text-on-surface">{{ customer.reference or '-' }}</strong>
                     </li>
-                    <li class="list-group-item d-flex justify-content-between px-0">
-                        <span class="text-muted">Telefon</span>
-                        <strong>{{ customer.phone or '-' }}</strong>
+                    <li class="py-3 flex justify-between items-center">
+                        <span class="text-on-surface-variant font-label-md text-label-md uppercase">Telefon</span>
+                        <strong class="text-on-surface">{{ customer.phone or '-' }}</strong>
                     </li>
-                    <li class="list-group-item d-flex justify-content-between px-0">
-                        <span class="text-muted">İlçe</span>
-                        <strong>{{ customer.district or '-' }}</strong>
+                    <li class="py-3 flex justify-between items-center">
+                        <span class="text-on-surface-variant font-label-md text-label-md uppercase">İlçe</span>
+                        <strong class="text-on-surface">{{ customer.district or '-' }}</strong>
                     </li>
-                    <li class="list-group-item d-flex justify-content-between px-0">
-                        <span class="text-muted">Meslek</span>
-                        <strong>{{ customer.profession or '-' }}</strong>
+                    <li class="py-3 flex justify-between items-center">
+                        <span class="text-on-surface-variant font-label-md text-label-md uppercase">Meslek</span>
+                        <strong class="text-on-surface">{{ customer.profession or '-' }}</strong>
                     </li>
-                    <li class="list-group-item d-flex justify-content-between px-0">
-                        <span class="text-muted">Doğum Tarihi</span>
-                        <strong>{{ customer.birth_date or '-' }}</strong>
+                    <li class="py-3 flex justify-between items-center">
+                        <span class="text-on-surface-variant font-label-md text-label-md uppercase">Doğum Tarihi</span>
+                        <strong class="text-on-surface">{{ customer.birth_date or '-' }}</strong>
                     </li>
                 </ul>
-                <div class="mt-4 pt-3 border-top">
-                    <small class="text-muted">Sorumlu Arayıcı: </small>
-                    <span class="badge bg-secondary">{{ customer.assigned_user.username if customer.assigned_user else 'Atanmadı' }}</span>
+                <div class="mt-6 pt-4 border-t border-white/10 flex items-center justify-between">
+                    <small class="text-on-surface-variant font-label-md text-label-md uppercase">Sorumlu Arayıcı</small>
+                    <span class="bg-surface-variant text-white px-2 py-1 rounded font-label-md text-sm">{{ customer.assigned_user.username if customer.assigned_user else 'Atanmadı' }}</span>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Sağ Taraf: Notlar -->
-    <div class="col-md-8">
-        <div class="card shadow-sm mb-4">
-            <div class="card-header bg-white">
-                <h5 class="mb-0 py-1">Yeni Not Ekle</h5>
-            </div>
-            <div class="card-body">
-                <form method="POST" action="">
-                    {{ form.hidden_tag() }}
-                    <div class="mb-3">
-                        {{ form.content(class="form-control", rows="3", placeholder="Müşteri görüşmesiyle ilgili detayları buraya yazın...") }}
-                    </div>
-                    <div class="text-end">
-                        {{ form.submit(class="btn btn-primary") }}
-                    </div>
-                </form>
-            </div>
+    <div class="lg:col-span-2 flex flex-col gap-6">
+        <div class="glass-card rounded-xl p-6">
+            <h5 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined text-[24px] text-primary">note_add</span>
+                Yeni Not Ekle
+            </h5>
+            <form method="POST" action="">
+                {{ form.hidden_tag() }}
+                <div class="mb-4">
+                    {{ form.content(class="w-full bg-surface-container-high border border-white/10 rounded-md p-3 text-white focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors min-h-[100px]", placeholder="Müşteri görüşmesiyle ilgili detayları buraya yazın...") }}
+                </div>
+                <div class="text-right">
+                    {{ form.submit(class="ruby-btn px-6 py-2 rounded-lg font-body-md text-body-md font-medium cursor-pointer transition-colors") }}
+                </div>
+            </form>
         </div>
 
-        <h5 class="mb-3">Görüşme Geçmişi</h5>
-        {% if notes %}
-            <div class="list-group shadow-sm">
-                {% for note in notes %}
-                <div class="list-group-item list-group-item-action p-3">
-                    <div class="d-flex w-100 justify-content-between mb-2">
-                        <h6 class="mb-0 fw-bold">{{ note.user.username }}</h6>
-                        <small class="text-muted">{{ note.created_at.strftime('%d.%m.%Y %H:%M') }}</small>
+        <div>
+            <h5 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined text-[24px] text-primary">history</span>
+                Görüşme Geçmişi
+            </h5>
+            
+            {% if notes %}
+                <div class="flex flex-col gap-3">
+                    {% for note in notes %}
+                    <div class="glass-card rounded-lg p-4 border-l-4 border-l-primary/50 hover:border-l-primary transition-colors">
+                        <div class="flex w-full justify-between items-center mb-2">
+                            <h6 class="text-on-surface font-bold font-label-md flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[16px] text-on-surface-variant">person</span>
+                                {{ note.user.username }}
+                            </h6>
+                            <small class="text-on-surface-variant font-label-md">{{ note.created_at.strftime('%d.%m.%Y %H:%M') }}</small>
+                        </div>
+                        <p class="text-on-surface opacity-90">{{ note.content }}</p>
                     </div>
-                    <p class="mb-0">{{ note.content }}</p>
+                    {% endfor %}
                 </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <div class="alert alert-light text-center border text-muted">
-                Henüz bir görüşme notu eklenmemiş.
-            </div>
-        {% endif %}
+            {% else %}
+                <div class="glass-card rounded-lg p-8 text-center border-dashed border-white/10">
+                    <span class="material-symbols-outlined text-[48px] text-on-surface-variant mb-2 opacity-50">speaker_notes_off</span>
+                    <p class="text-on-surface-variant">Henüz bir görüşme notu eklenmemiş.</p>
+                </div>
+            {% endif %}
+        </div>
     </div>
 </div>
 {% endblock %}

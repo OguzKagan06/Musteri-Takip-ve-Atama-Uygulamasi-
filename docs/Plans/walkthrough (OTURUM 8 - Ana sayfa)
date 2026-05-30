@@ -1,0 +1,24 @@
+# Ana Portal (Hub) ve Footer Tasarımı Tamamlandı
+
+Planımıza uygun olarak uygulamanızın kurumsal kimliğini öne çıkaran, kullanıcıları karşılayan yepyeni bir "Ana Portal" arayüzü ve yapışkan (sticky) bir footer eklendi.
+
+## Yapılan Değişiklikler
+
+*   **1. Dinamik Anasayfa Yönlendirmesi (`app/main/routes.py`)**
+    *   Uygulamanın kök dizini olan `/` rotası akıllandırıldı. Sisteme giriş yapmamış anonim bir kullanıcı doğrudan bu URL'ye geldiğinde otomatik olarak Login (Giriş) ekranına yönlendirilmektedir.
+    *   Giriş yapan yetkili bir kullanıcı ise, eskiden olduğu gibi direkt Dashboard tablosuna düşmek yerine, modüllerin listelendiği `main/index.html` ana karşılama ekranına alınmaktadır.
+
+*   **2. Bootstrap 5 Modüler Hub Arayüzü (`app/templates/main/index.html`)**
+    *   Sayfa, "Cyber Gate CRM'e Hoş Geldiniz" başlığıyla kullanıcıyı şık bir şekilde karşılıyor.
+    *   Altında Bootstrap Card yapısı ile hizalanmış 4 farklı modül sekmesi yer alıyor:
+        *   **Müşteri Yönetimi (CRM):** Aktif olan tek karttır, renkleri canlı mavi (primary) tonlarındadır ve kullanıcınızı doğrudan CRM modülüne (Dashboard) götürür.
+        *   **Gelişmiş Raporlar, Takvim & Görevler, Kullanıcı İstatistikleri:** Gelecekte eklenecek olan modüllerin taslak (pasif) kartlarıdır. Butonları kapalıdır (disabled) ve üzerlerinde modern Bootstrap Badge ile "Çok Yakında" yazmaktadır.
+
+*   **3. Global Footer Entegrasyonu (`app/templates/base.html`)**
+    *   Tüm sayfaların şablonunu oluşturan base dosyasına `<footer>` bileşeni eklendi.
+    *   "Copyright © 2026 Cyber Gate CRM - Tüm hakları saklıdır." yazısı, sitenin geneline uyumlu koyu (dark) bir arkaplan üzerinde ortalandı.
+    *   Özellikle sayfa içeriğinin (örneğin sadece login formu varken) kısa kaldığı durumlarda, footer'ın ekranın ortasına değil **her zaman ekranın en altına (sticky-footer)** yapışması için `<body>` etiketine `d-flex flex-column min-vh-100` Bootstrap sınıfları uygulandı.
+    *   Sol üstteki "Cyber Gate CRM" marka yazısı tıklanabilir hale getirilerek ana portal ekranına (`/`) bağlandı.
+
+## Test ve Doğrulama
+Kod dosyaları derlenerek hatalara karşı test edildi ve hiçbir soruna rastlanmadı. Veritabanı ile ilgili bir değişiklik yapılmadığı için doğrudan `flask run` komutunu kullanarak, giriş yaptıktan sonra sizi karşılayacak olan yeni Portal'ı ve sayfanın en altına konumlanmış şık Footer'ı deneyimleyebilirsiniz.

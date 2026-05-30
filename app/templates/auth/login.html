@@ -1,41 +1,35 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
 {% block title %}Giriş Yap{% endblock %}
+{% block header_title %}Sistem Girişi{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6 col-lg-4 mt-5">
-        <div class="card shadow-sm">
-            <div class="card-body p-4">
-                <h3 class="card-title text-center mb-4">Giriş Yap</h3>
-                <form method="POST" action="">
-                    {{ form.hidden_tag() }}
-                    
-                    <div class="mb-3">
-                        {{ form.username.label(class="form-label") }}
-                        {{ form.username(class="form-control") }}
-                        {% for error in form.username.errors %}
-                            <div class="text-danger small mt-1">{{ error }}</div>
-                        {% endfor %}
-                    </div>
-                    
-                    <div class="mb-4">
-                        {{ form.password.label(class="form-label") }}
-                        {{ form.password(class="form-control") }}
-                        {% for error in form.password.errors %}
-                            <div class="text-danger small mt-1">{{ error }}</div>
-                        {% endfor %}
-                    </div>
-                    
-                    <div class="d-grid gap-2">
-                        {{ form.submit(class="btn btn-primary") }}
-                    </div>
-                </form>
-                <div class="mt-3 text-center">
-                    <p class="mb-0">Hesabınız yok mu? <a href="{{ url_for('auth.register') }}" class="text-decoration-none">Kayıt Ol</a></p>
-                </div>
-            </div>
+<div class="flex justify-center mt-12">
+    <div class="glass-card rounded-xl p-8 w-full max-w-md">
+        <div class="text-center mb-6">
+            <span class="material-symbols-outlined text-[48px] text-primary mb-2">lock</span>
+            <h3 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Oturum Aç</h3>
         </div>
+        <form method="POST" action="" novalidate class="flex flex-col gap-4">
+            {{ form.hidden_tag() }}
+            <div>
+                {{ form.username.label(class="block font-label-md text-label-md text-on-surface-variant mb-1") }}
+                {{ form.username(class="w-full bg-surface-container-high border border-white/10 rounded-md p-2 text-white focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors") }}
+                {% for error in form.username.errors %}
+                    <span class="text-error text-sm mt-1 block">{{ error }}</span>
+                {% endfor %}
+            </div>
+            <div>
+                {{ form.password.label(class="block font-label-md text-label-md text-on-surface-variant mb-1") }}
+                {{ form.password(class="w-full bg-surface-container-high border border-white/10 rounded-md p-2 text-white focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors") }}
+                {% for error in form.password.errors %}
+                    <span class="text-error text-sm mt-1 block">{{ error }}</span>
+                {% endfor %}
+            </div>
+            <div class="mt-4">
+                {{ form.submit(class="ruby-btn w-full py-2 rounded-lg font-body-md text-body-md font-medium cursor-pointer transition-colors") }}
+            </div>
+        </form>
     </div>
 </div>
 {% endblock %}

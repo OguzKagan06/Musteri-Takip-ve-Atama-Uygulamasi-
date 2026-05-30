@@ -1,16 +1,18 @@
 {% extends "base.html" %}
 
-{% block title %}Sunucu Hatası{% endblock %}
+{% block title %}500 - Sunucu Hatası{% endblock %}
+{% block header_title %}Hata 500{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center mt-5">
-    <div class="col-md-6 text-center">
-        <h1 class="display-1 fw-bold text-danger">500</h1>
-        <p class="fs-3">Beklenmeyen bir hata oluştu.</p>
-        <p class="lead">
-            Sistem yöneticileri bilgilendirildi. Lütfen daha sonra tekrar deneyin.
+<div class="flex justify-center items-center h-[60vh]">
+    <div class="glass-card rounded-xl p-12 text-center max-w-lg w-full border-dashed border-primary/30">
+        <span class="material-symbols-outlined text-[80px] text-primary mb-4 opacity-80">dns</span>
+        <h1 class="font-display-lg text-display-lg text-primary mb-2">500</h1>
+        <p class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-4">Sistem Hatası.</p>
+        <p class="font-body-md text-body-md text-on-surface-variant mb-8">
+            Sunucularımızda beklenmedik bir hata oluştu. Sorun loglandı ve inceleniyor.
         </p>
-        <a href="{{ url_for('main.index') }}" class="btn btn-primary mt-3">Anasayfaya Dön</a>
+        <a href="{{ url_for('main.index') }}" class="ruby-btn px-8 py-3 rounded-lg font-body-md text-body-md font-medium transition-colors inline-block">Anasayfaya Dön</a>
     </div>
 </div>
 {% endblock %}

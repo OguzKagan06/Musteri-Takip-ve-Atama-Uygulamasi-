@@ -1,74 +1,263 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html class="dark" lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}CRM Uygulaması{% endblock %}</title>
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    {% block head %}{% endblock %}
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>{% block title %}Cyber Gate CRM{% endblock %}</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "secondary-fixed": "#e5e2e1",
+                "surface-container-high": "#2a2a2a",
+                "outline-variant": "#5e3f3a",
+                "secondary-fixed-dim": "#c8c6c5",
+                "outline": "#ae8882",
+                "on-surface": "#e5e2e1",
+                "surface-container-low": "#1c1b1b",
+                "on-primary-container": "#ffdad4",
+                "tertiary-fixed": "#e2e2e2",
+                "inverse-surface": "#e5e2e1",
+                "tertiary": "#c6c6c7",
+                "surface-variant": "#353534",
+                "surface-container-highest": "#353534",
+                "on-tertiary-container": "#e2e3e3",
+                "on-primary": "#690000",
+                "primary-fixed-dim": "#ffb4a8",
+                "on-tertiary": "#2f3131",
+                "tertiary-container": "#636565",
+                "on-secondary": "#313030",
+                "surface-container-lowest": "#0e0e0e",
+                "inverse-on-surface": "#313030",
+                "on-tertiary-fixed-variant": "#454747",
+                "error-container": "#93000a",
+                "on-secondary-container": "#b7b5b4",
+                "surface-dim": "#131313",
+                "on-primary-fixed-variant": "#930000",
+                "on-secondary-fixed-variant": "#474746",
+                "on-background": "#e5e2e1",
+                "on-secondary-fixed": "#1c1b1b",
+                "on-tertiary-fixed": "#1a1c1c",
+                "secondary-container": "#474746",
+                "error": "#ffb4ab",
+                "inverse-primary": "#c00000",
+                "on-surface-variant": "#e8bdb6",
+                "primary-container": "#cc0000",
+                "primary": "#ffb4a8",
+                "surface": "#131313",
+                "surface-bright": "#3a3939",
+                "secondary": "#c8c6c5",
+                "on-error-container": "#ffdad6",
+                "tertiary-fixed-dim": "#c6c6c7",
+                "background": "#131313",
+                "on-primary-fixed": "#410000",
+                "primary-fixed": "#ffdad4",
+                "surface-container": "#201f1f",
+                "on-error": "#690005",
+                "surface-tint": "#ffb4a8"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.125rem",
+                "lg": "0.25rem",
+                "xl": "0.5rem",
+                "full": "0.75rem"
+        },
+        "spacing": {
+                "margin-desktop": "64px",
+                "container-max": "1280px",
+                "margin-mobile": "16px",
+                "base": "8px",
+                "gutter": "24px"
+        },
+        "fontFamily": {
+                "headline-lg": ["Geist"],
+                "display-lg": ["Geist"],
+                "body-md": ["Geist"],
+                "headline-lg-mobile": ["Geist"],
+                "label-md": ["JetBrains Mono"]
+        },
+        "fontSize": {
+                "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "500"}]
+        }
+      }
+    }
+  }
+</script>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400..700&family=JetBrains+Mono:wght@500&display=swap');
+    /* Geist placeholder */
+    @font-face {
+        font-family: 'Geist';
+        src: local('Inter'), local('Segoe UI');
+    }
+    .glass-card {
+        background: rgba(30, 30, 30, 0.6);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        position: relative;
+    }
+    .glass-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.02) 100%);
+    }
+    .coming-soon-badge {
+        background-color: rgba(204, 0, 0, 0.15);
+        color: #cc0000;
+    }
+    .ruby-btn {
+        background-color: #cc0000;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+    .ruby-btn:hover::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at center, rgba(255,255,255,0.1) 0%, transparent 70%);
+    }
+    .ruby-btn-secondary {
+        background-color: transparent;
+        border: 1px solid #B0B0B0;
+        color: white;
+    }
+    .ruby-btn-secondary:hover {
+        border-color: #cc0000;
+        color: #cc0000;
+    }
+    html { scroll-behavior: smooth; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+</style>
+{% block head %}{% endblock %}
 </head>
-<body class="bg-light d-flex flex-column min-vh-100">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 shadow-sm">
-        <div class="container">
-            <a class="navbar-brand fw-bold" href="{{ url_for('main.index') }}">Cyber Gate CRM</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto align-items-center">
-                    {% if current_user.is_authenticated %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('crm.dashboard') }}">Dashboard</a>
-                        </li>
-                        {% if current_user.role == 'admin' %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('auth.register') }}">Kullanıcı Ekle</a>
-                        </li>
-                        {% endif %}
-                        <li class="nav-item ms-lg-3">
-                            <a class="nav-link d-flex align-items-center" href="{{ url_for('auth.profile') }}">
-                                <img src="{{ url_for('static', filename='avatars/' + current_user.avatar_file) }}" alt="Avatar" class="rounded-circle me-2" style="width: 30px; height: 30px; object-fit: cover;">
-                                <span>{{ current_user.username }}</span>
-                            </a>
-                        </li>
-                        <li class="nav-item ms-lg-2">
-                            <a class="nav-link text-danger" href="{{ url_for('auth.logout') }}">Çıkış Yap</a>
-                        </li>
-                    {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('auth.login') }}">Giriş Yap</a>
-                        </li>
-                    {% endif %}
-                </ul>
+<body class="bg-background text-on-background min-h-screen flex selection:bg-primary-container selection:text-on-primary-container">
+
+<div class="fixed inset-0 pointer-events-none overflow-hidden z-0">
+    <div class="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] rounded-full bg-primary-container opacity-5 blur-[120px]"></div>
+    <div class="absolute bottom-[-10%] left-[-10%] w-[400px] h-[400px] rounded-full bg-primary-container opacity-5 blur-[100px]"></div>
+</div>
+
+<nav aria-label="Main Navigation" class="hidden md:flex flex-col h-screen w-64 fixed left-0 top-0 bg-surface-container border-r border-white/10 backdrop-blur-xl z-20 py-gutter px-4">
+    <div class="mb-8 px-2 mt-4">
+        <h1 class="font-headline-lg text-headline-lg text-primary tracking-tighter">Cyber Gate CRM</h1>
+        <p class="font-body-md text-body-md text-on-surface-variant opacity-70">Command Center</p>
+    </div>
+    
+    {% if current_user.is_authenticated and current_user.role == 'admin' %}
+    <a href="{{ url_for('crm.new_customer') }}" class="ruby-btn font-body-md text-body-md font-medium py-3 px-4 rounded-lg w-full flex items-center justify-center gap-2 mb-8 transition-all duration-200 hover:scale-95">
+        <span class="material-symbols-outlined text-[18px]">add</span>
+        Yeni Kayıt Ekle
+    </a>
+    {% else %}
+    <div class="h-[72px]"></div>
+    {% endif %}
+
+    <ul class="flex flex-col gap-2 flex-grow overflow-y-auto no-scrollbar">
+    {% if current_user.is_authenticated %}
+        <li>
+            <a class="flex items-center gap-3 px-3 py-3 rounded-lg {% if request.endpoint == 'main.index' %}text-primary font-bold border-r-2 border-primary bg-primary/10{% else %}text-on-surface-variant font-medium opacity-70 hover:bg-primary/10 hover:text-primary hover:opacity-100{% endif %} transition-all duration-200" href="{{ url_for('main.index') }}">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' {% if request.endpoint == 'main.index' %}1{% else %}0{% endif %};">dashboard</span>
+                <span class="font-body-md text-body-md">Hub</span>
+            </a>
+        </li>
+        <li>
+            <a class="flex items-center gap-3 px-3 py-3 rounded-lg {% if request.endpoint == 'crm.dashboard' %}text-primary font-bold border-r-2 border-primary bg-primary/10{% else %}text-on-surface-variant font-medium opacity-70 hover:bg-primary/10 hover:text-primary hover:opacity-100{% endif %} transition-all duration-200" href="{{ url_for('crm.dashboard') }}">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' {% if request.endpoint == 'crm.dashboard' %}1{% else %}0{% endif %};">group</span>
+                <span class="font-body-md text-body-md">Müşteri Yönetimi</span>
+            </a>
+        </li>
+        {% if current_user.role == 'admin' %}
+        <li>
+            <a class="flex items-center gap-3 px-3 py-3 rounded-lg {% if request.endpoint == 'auth.register' %}text-primary font-bold border-r-2 border-primary bg-primary/10{% else %}text-on-surface-variant font-medium opacity-70 hover:bg-primary/10 hover:text-primary hover:opacity-100{% endif %} transition-all duration-200" href="{{ url_for('auth.register') }}">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' {% if request.endpoint == 'auth.register' %}1{% else %}0{% endif %};">person_add</span>
+                <span class="font-body-md text-body-md">Kullanıcı Ekle</span>
+            </a>
+        </li>
+        {% endif %}
+    {% else %}
+        <li>
+            <a class="flex items-center gap-3 px-3 py-3 rounded-lg text-primary font-bold border-r-2 border-primary bg-primary/10 transition-all duration-200" href="{{ url_for('auth.login') }}">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">login</span>
+                <span class="font-body-md text-body-md">Giriş Yap</span>
+            </a>
+        </li>
+    {% endif %}
+    </ul>
+
+    {% if current_user.is_authenticated %}
+    <div class="mt-auto pt-4 border-t border-white/10 mb-4">
+        <ul class="flex flex-col gap-2">
+            <li>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant font-medium opacity-70 hover:bg-primary/10 hover:text-primary transition-all duration-200" href="{{ url_for('auth.profile') }}">
+                    <span class="material-symbols-outlined">settings</span>
+                    <span class="font-body-md text-body-md">Profil Ayarları</span>
+                </a>
+            </li>
+            <li>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant font-medium opacity-70 hover:bg-primary/10 hover:text-primary transition-all duration-200" href="{{ url_for('auth.logout') }}">
+                    <span class="material-symbols-outlined">logout</span>
+                    <span class="font-body-md text-body-md">Çıkış</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    {% endif %}
+</nav>
+
+<main class="flex-1 w-full md:ml-64 flex flex-col relative z-10 min-h-screen">
+    <header class="docked full-width top-0 sticky bg-background/60 backdrop-blur-md border-b border-white/5 z-30 px-6 py-4 flex justify-between items-center transition-all duration-300">
+        <div class="flex items-center gap-4">
+            <h2 class="text-on-surface font-headline-lg text-headline-lg md:font-headline-lg md:text-headline-lg font-headline-lg-mobile text-headline-lg-mobile">
+                {% block header_title %}Cyber Gate CRM{% endblock %}
+            </h2>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2 border-l border-white/10 pl-4">
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('auth.profile') }}" class="text-on-surface-variant hover:text-primary transition-colors p-2 rounded-full hover:bg-surface-variant flex items-center gap-2">
+                    <img src="{{ url_for('static', filename='avatars/' + current_user.avatar_file) }}" alt="Avatar" class="rounded-full object-cover" style="width: 32px; height: 32px;">
+                    <span class="hidden md:inline font-label-md text-on-surface">{{ current_user.username }}</span>
+                </a>
+                {% endif %}
             </div>
         </div>
-    </nav>
+    </header>
 
-    <div class="container">
+    <div class="p-6 w-full max-w-container-max mx-auto flex-grow flex flex-col">
         {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endfor %}
-            {% endif %}
+        {% if messages %}
+        <div class="mb-6 flex flex-col gap-2">
+            {% for category, message in messages %}
+            <div class="p-4 rounded-lg flex items-center justify-between {% if category == 'success' %}bg-green-500/10 text-green-400 border border-green-500/20{% elif category == 'danger' or category == 'error' %}bg-red-500/10 text-red-400 border border-red-500/20{% else %}bg-blue-500/10 text-blue-400 border border-blue-500/20{% endif %}">
+                <span>{{ message }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
         {% endwith %}
-        
+
         {% block content %}{% endblock %}
     </div>
 
-    <!-- Footer -->
-    <footer class="mt-auto py-3 bg-dark text-white-50 text-center">
-        <div class="container">
-            <small>Copyright &copy; 2026 Cyber Gate CRM - Tüm hakları saklıdır.</small>
-        </div>
+    <footer class="mt-auto py-6 border-t border-white/5 text-center bg-surface/50 backdrop-blur">
+        <small class="text-on-surface-variant opacity-50 font-label-md">Copyright &copy; 2026 Cyber Gate CRM - Tüm hakları saklıdır.</small>
     </footer>
-
-    <!-- Bootstrap 5 JS Bundle (with Popper) -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    {% block scripts %}{% endblock %}
+</main>
+{% block scripts %}{% endblock %}
 </body>
 </html>

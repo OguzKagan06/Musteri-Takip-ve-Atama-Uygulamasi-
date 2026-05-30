@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="tr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Cyber Gate CRM - Dashboard</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "secondary-fixed": "#e5e2e1",
+                "surface-container-high": "#2a2a2a",
+                "outline-variant": "#5e3f3a",
+                "secondary-fixed-dim": "#c8c6c5",
+                "outline": "#ae8882",
+                "on-surface": "#e5e2e1",
+                "surface-container-low": "#1c1b1b",
+                "on-primary-container": "#ffdad4",
+                "tertiary-fixed": "#e2e2e2",
+                "inverse-surface": "#e5e2e1",
+                "tertiary": "#c6c6c7",
+                "surface-variant": "#353534",
+                "surface-container-highest": "#353534",
+                "on-tertiary-container": "#e2e3e3",
+                "on-primary": "#690000",
+                "primary-fixed-dim": "#ffb4a8",
+                "on-tertiary": "#2f3131",
+                "tertiary-container": "#636565",
+                "on-secondary": "#313030",
+                "surface-container-lowest": "#0e0e0e",
+                "inverse-on-surface": "#313030",
+                "on-tertiary-fixed-variant": "#454747",
+                "error-container": "#93000a",
+                "on-secondary-container": "#b7b5b4",
+                "surface-dim": "#131313",
+                "on-primary-fixed-variant": "#930000",
+                "on-secondary-fixed-variant": "#474746",
+                "on-background": "#e5e2e1",
+                "on-secondary-fixed": "#1c1b1b",
+                "on-tertiary-fixed": "#1a1c1c",
+                "secondary-container": "#474746",
+                "error": "#ffb4ab",
+                "inverse-primary": "#c00000",
+                "on-surface-variant": "#e8bdb6",
+                "primary-container": "#cc0000",
+                "primary": "#ffb4a8",
+                "surface": "#131313",
+                "surface-bright": "#3a3939",
+                "secondary": "#c8c6c5",
+                "on-error-container": "#ffdad6",
+                "tertiary-fixed-dim": "#c6c6c7",
+                "background": "#131313",
+                "on-primary-fixed": "#410000",
+                "primary-fixed": "#ffdad4",
+                "surface-container": "#201f1f",
+                "on-error": "#690005",
+                "surface-tint": "#ffb4a8"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.125rem",
+                "lg": "0.25rem",
+                "xl": "0.5rem",
+                "full": "0.75rem"
+        },
+        "spacing": {
+                "margin-desktop": "64px",
+                "container-max": "1280px",
+                "margin-mobile": "16px",
+                "base": "8px",
+                "gutter": "24px"
+        },
+        "fontFamily": {
+                "headline-lg": [
+                        "Geist"
+                ],
+                "display-lg": [
+                        "Geist"
+                ],
+                "body-md": [
+                        "Geist"
+                ],
+                "headline-lg-mobile": [
+                        "Geist"
+                ],
+                "label-md": [
+                        "JetBrains Mono"
+                ]
+        },
+        "fontSize": {
+                "headline-lg": [
+                        "32px",
+                        {
+                                "lineHeight": "40px",
+                                "fontWeight": "600"
+                        }
+                ],
+                "display-lg": [
+                        "48px",
+                        {
+                                "lineHeight": "56px",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "body-md": [
+                        "16px",
+                        {
+                                "lineHeight": "24px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "headline-lg-mobile": [
+                        "24px",
+                        {
+                                "lineHeight": "32px",
+                                "fontWeight": "600"
+                        }
+                ],
+                "label-md": [
+                        "14px",
+                        {
+                                "lineHeight": "20px",
+                                "letterSpacing": "0.05em",
+                                "fontWeight": "500"
+                        }
+                ]
+        }
+},
+    },
+  }
+</script>
+<style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400..700&family=JetBrains+Mono:wght@500&display=swap');
+        /* Geist placeholder */
+        @font-face {
+            font-family: 'Geist';
+            src: local('Inter'), local('Segoe UI');
+        }
+        
+        .glass-card {
+            background: rgba(30, 30, 30, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.02) 100%);
+        }
+        .coming-soon-badge {
+            background-color: rgba(204, 0, 0, 0.15);
+            color: #cc0000;
+        }
+        .ruby-btn {
+            background-color: #cc0000;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        .ruby-btn:hover::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(255,255,255,0.1) 0%, transparent 70%);
+        }
+        .ruby-btn-secondary {
+            background-color: transparent;
+            border: 1px solid #B0B0B0;
+            color: white;
+        }
+        .ruby-btn-secondary:hover {
+            border-color: #cc0000;
+            color: #cc0000;
+        }
+        
+        /* Smooth scrolling */
+        html { scroll-behavior: smooth; }
+        
+        /* Hide scrollbar for nav */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex selection:bg-primary-container selection:text-on-primary-container">
+<!-- Background Ambient Glow -->
+<div class="fixed inset-0 pointer-events-none overflow-hidden z-0">
+<div class="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] rounded-full bg-primary-container opacity-5 blur-[120px]"></div>
+<div class="absolute bottom-[-10%] left-[-10%] w-[400px] h-[400px] rounded-full bg-primary-container opacity-5 blur-[100px]"></div>
+</div>
+<!-- SideNavBar (Desktop) -->
+<nav aria-label="Main Navigation" class="hidden md:flex flex-col h-screen w-64 fixed left-0 top-0 bg-surface-container border-r border-white/10 backdrop-blur-xl z-20 py-gutter px-4">
+<!-- Brand / Header -->
+<div class="mb-8 px-2 mt-4">
+<h1 class="font-headline-lg text-headline-lg text-primary tracking-tighter">Cyber Gate CRM</h1>
+<p class="font-body-md text-body-md text-on-surface-variant opacity-70">Command Center</p>
+</div>
+<!-- CTA -->
+<button class="ruby-btn font-body-md text-body-md font-medium py-3 px-4 rounded-lg w-full flex items-center justify-center gap-2 mb-8 transition-all duration-200 hover:scale-95">
+<span class="material-symbols-outlined text-[18px]">add</span>
+            Yeni Kayıt Ekle
+        </button>
+<!-- Tabs -->
+<ul class="flex flex-col gap-2 flex-grow overflow-y-auto no-scrollbar">
+<li>
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg text-primary font-bold border-r-2 border-primary bg-primary/10 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="font-body-md text-body-md">Dashboard</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg text-on-surface-variant font-medium opacity-70 hover:bg-primary/10 hover:text-primary transition-all duration-200 hover:opacity-100" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-body-md text-body-md">Müşteri Yönetimi</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg text-on-surface-variant font-medium opacity-70 hover:bg-primary/10 hover:text-primary transition-all duration-200 hover:opacity-100" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-body-md text-body-md">Gelişmiş Raporlar</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg text-on-surface-variant font-medium opacity-70 hover:bg-primary/10 hover:text-primary transition-all duration-200 hover:opacity-100" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-body-md text-body-md">Takvim &amp; Görevler</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg text-on-surface-variant font-medium opacity-70 hover:bg-primary/10 hover:text-primary transition-all duration-200 hover:opacity-100" href="#">
+<span class="material-symbols-outlined">query_stats</span>
+<span class="font-body-md text-body-md">Kullanıcı İstatistikleri</span>
+</a>
+</li>
+</ul>
+<!-- Footer / Settings -->
+<div class="mt-auto pt-4 border-t border-white/10">
+<ul class="flex flex-col gap-2">
+<li>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant font-medium opacity-70 hover:bg-primary/10 hover:text-primary transition-all duration-200" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-md text-body-md">Ayarlar</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant font-medium opacity-70 hover:bg-primary/10 hover:text-primary transition-all duration-200" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-body-md text-body-md">Çıkış</span>
+</a>
+</li>
+</ul>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 w-full md:ml-64 flex flex-col relative z-10">
+<!-- TopAppBar -->
+<header class="docked full-width top-0 sticky bg-background/60 backdrop-blur-md border-b border-white/5 z-30 px-margin-desktop py-4 flex justify-between items-center transition-all duration-300">
+<div class="flex items-center gap-4">
+<!-- Mobile Menu Trigger -->
+<button class="md:hidden text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h2 class="text-on-surface font-headline-lg text-headline-lg md:font-headline-lg md:text-headline-lg font-headline-lg-mobile text-headline-lg-mobile">
+                    Cyber Gate CRM'e Hoş Geldiniz
+                </h2>
+</div>
+<div class="flex items-center gap-4">
+<!-- Search (Abstracted to icon for desktop compactness) -->
+<button class="text-on-surface-variant hover:text-primary transition-colors p-2 rounded-full hover:bg-surface-variant">
+<span class="material-symbols-outlined">search</span>
+</button>
+<div class="flex items-center gap-2 border-l border-white/10 pl-4">
+<button class="text-on-surface-variant hover:text-primary transition-colors p-2 rounded-full hover:bg-surface-variant relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-primary-container rounded-full"></span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors p-2 rounded-full hover:bg-surface-variant">
+<span class="material-symbols-outlined">help</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors p-2 rounded-full hover:bg-surface-variant ml-2">
+<span class="material-symbols-outlined text-[28px]">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Canvas -->
+<div class="p-margin-desktop w-full max-w-container-max mx-auto">
+<!-- Dashboard Stats Summary (Optional enhancement) -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+<div class="glass-card rounded-xl p-4 flex flex-col gap-1">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Akitf Kullanıcı</span>
+<span class="font-display-lg text-display-lg text-on-surface">1,204</span>
+</div>
+<div class="glass-card rounded-xl p-4 flex flex-col gap-1">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Sistem Yükü</span>
+<span class="font-display-lg text-display-lg text-on-surface">24%</span>
+</div>
+</div>
+<!-- Bento Grid Modules -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Module 1: Müşteri Yönetimi -->
+<article class="glass-card rounded-xl p-6 flex flex-col gap-4 group hover:-translate-y-1 transition-transform duration-300">
+<div class="flex justify-between items-start">
+<div class="w-12 h-12 rounded-lg bg-surface-variant/50 border border-white/10 flex items-center justify-center text-primary group-hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined text-[24px]">group</span>
+</div>
+</div>
+<div>
+<h3 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-2">Müşteri Yönetimi</h3>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2">
+                            Müşteri verilerini ve ilişkilerini yönetin.
+                        </p>
+</div>
+<div class="mt-auto pt-4">
+<button class="ruby-btn w-full py-2 rounded-lg font-body-md text-body-md font-medium transition-colors">
+                            Modüle Git
+                        </button>
+</div>
+</article>
+<!-- Module 2: Gelişmiş Raporlar -->
+<article class="glass-card rounded-xl p-6 flex flex-col gap-4 group hover:-translate-y-1 transition-transform duration-300">
+<div class="flex justify-between items-start">
+<div class="w-12 h-12 rounded-lg bg-surface-variant/50 border border-white/10 flex items-center justify-center text-primary group-hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined text-[24px]">analytics</span>
+</div>
+</div>
+<div>
+<h3 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-2">Gelişmiş Raporlar</h3>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2">
+                            Detaylı analizler ve performans raporları.
+                        </p>
+</div>
+<div class="mt-auto pt-4">
+<button class="ruby-btn w-full py-2 rounded-lg font-body-md text-body-md font-medium transition-colors">
+                            Modüle Git
+                        </button>
+</div>
+</article>
+<!-- Module 3: Takvim & Görevler -->
+<article class="glass-card rounded-xl p-6 flex flex-col gap-4 group hover:-translate-y-1 transition-transform duration-300">
+<div class="flex justify-between items-start">
+<div class="w-12 h-12 rounded-lg bg-surface-variant/50 border border-white/10 flex items-center justify-center text-primary group-hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined text-[24px]">calendar_today</span>
+</div>
+</div>
+<div>
+<h3 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-2">Takvim &amp; Görevler</h3>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2">
+                            Ekip görevlerini ve önemli tarihleri takip edin.
+                        </p>
+</div>
+<div class="mt-auto pt-4">
+<button class="ruby-btn w-full py-2 rounded-lg font-body-md text-body-md font-medium transition-colors">
+                            Modüle Git
+                        </button>
+</div>
+</article>
+<!-- Module 4: Kullanıcı İstatistikleri -->
+<article class="glass-card rounded-xl p-6 flex flex-col gap-4 group hover:-translate-y-1 transition-transform duration-300">
+<div class="flex justify-between items-start">
+<div class="w-12 h-12 rounded-lg bg-surface-variant/50 border border-white/10 flex items-center justify-center text-primary group-hover:bg-primary/10 transition-colors">
+<span class="material-symbols-outlined text-[24px]">query_stats</span>
+</div>
+</div>
+<div>
+<h3 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-2">Kullanıcı İstatistikleri</h3>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2">
+                            Kullanıcı etkileşimi ve sistem verileri.
+                        </p>
+</div>
+<div class="mt-auto pt-4">
+<button class="ruby-btn w-full py-2 rounded-lg font-body-md text-body-md font-medium transition-colors">
+                            Modüle Git
+                        </button>
+</div>
+</article>
+<!-- Module 5: Siber Güvenlik Paneli (Coming Soon) -->
+<article class="glass-card rounded-xl p-6 flex flex-col gap-4 opacity-80 border-dashed border-white/10">
+<div class="flex justify-between items-start">
+<div class="w-12 h-12 rounded-lg bg-surface-container/50 border border-white/5 flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[24px]">security</span>
+</div>
+<span class="coming-soon-badge font-label-md text-label-md px-2 py-1 rounded">Çok Yakında</span>
+</div>
+<div>
+<h3 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface-variant mb-2">Siber Güvenlik Paneli</h3>
+<p class="font-body-md text-body-md text-on-surface-variant/70 line-clamp-2">
+                            Gerçek zamanlı tehdit izleme ve güvenlik duvarı.
+                        </p>
+</div>
+<div class="mt-auto pt-4">
+<button class="w-full py-2 rounded-lg font-body-md text-body-md font-medium border border-white/5 text-on-surface-variant/50 cursor-not-allowed" disabled="">
+                            Modüle Git
+                        </button>
+</div>
+</article>
+<!-- Module 6: Otomasyon Merkezi (Coming Soon) -->
+<article class="glass-card rounded-xl p-6 flex flex-col gap-4 opacity-80 border-dashed border-white/10">
+<div class="flex justify-between items-start">
+<div class="w-12 h-12 rounded-lg bg-surface-container/50 border border-white/5 flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[24px]">smart_toy</span>
+</div>
+<span class="coming-soon-badge font-label-md text-label-md px-2 py-1 rounded">Çok Yakında</span>
+</div>
+<div>
+<h3 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface-variant mb-2">Otomasyon Merkezi</h3>
+<p class="font-body-md text-body-md text-on-surface-variant/70 line-clamp-2">
+                            Yapay zeka destekli iş akışı otomasyonu.
+                        </p>
+</div>
+<div class="mt-auto pt-4">
+<button class="w-full py-2 rounded-lg font-body-md text-body-md font-medium border border-white/5 text-on-surface-variant/50 cursor-not-allowed" disabled="">
+                            Modüle Git
+                        </button>
+</div>
+</article>
+</div>
+</div>
+</main>
+</body></html>

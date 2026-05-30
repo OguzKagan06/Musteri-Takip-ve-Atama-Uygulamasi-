@@ -1,0 +1,32 @@
+# 1. Etap Tamamlandı: Cyber Gate Redux İskeleti (Base & Hub)
+
+Vibe Coding prensibi doğrultusunda, uygulamanın ana iskeletini ve karşılama (Hub) ekranını yeni tasarım sistemine (Tailwind CSS, Glassmorphism, Dark Tech Minimalism) başarıyla taşıdık.
+
+## Yapılan Değişiklikler
+
+*   **1. Bootstrap'ten Tailwind'e Geçiş (`base.html`)**
+    *   Eski Bootstrap 5 CDN'i ve yapısı temizlendi. Yerine Tailwind CSS ve sağladığınız `tailwind-config` JSON betiği eklendi.
+    *   Tasarım sisteminde (DESIGN.md) belirtilen Cyber Red (#cc0000) renk paleti ve `Geist` tipografisi sisteme tanıtıldı.
+    *   `.glass-card` ve `.ruby-btn` gibi özel Glassmorphism sınıfları CSS bloğu olarak entegre edildi.
+    *   Sayfaya derinlik katan (Ambient Glow) arka plan kırmızı parlamaları eklendi.
+
+*   **2. Dinamik Yan Menü (SideNavBar) ve Üst Bar (TopAppBar)**
+    *   Sol tarafa yapışık, yarı saydam ve bulanık (backdrop-blur) şık bir menü yerleştirildi. 
+    *   Bu menüdeki bağlantılar statik değil; giriş yapan kullanıcının rolüne göre (`current_user.is_authenticated`) dinamik olarak oluşturuluyor. Örneğin, bir "arayıcı" girdiğinde "Kullanıcı Ekle" menüsünü göremiyor ancak admin görebiliyor.
+    *   Üst bar ise sayfanın akışında (sticky) kalarak, sağ üst köşede kullanıcının avatarını ve ismini barındırıyor.
+
+*   **3. Hub (Ana Portal) Modüllerinin Uyarlanması (`main/index.html`)**
+    *   Eski Hub ekranı tamamen yeni `code.html` tabanlı Grid yapısıyla değiştirildi.
+    *   "Müşteri Yönetimi" kartı aktif bir şekilde, üzerine gelindiğinde zıplama (hover:translate-y) efekti vererek `crm.dashboard` rotasına bağlandı.
+    *   Diğer modüller (Raporlar vb.) "Çok Yakında" rozeti (badge) ve kırmızı transparan arka planlarıyla, kilitli modül hissini başarıyla yansıtıyor.
+
+## Test ve Doğrulama
+Kodlarda CSRF veya Flask form yapılarına henüz dokunulmadı, sadece genel taşıyıcı iskelet güncellendi. Şu anda uygulamanızı (`flask run`) başlattığınızda;
+1. Sayfanın yepyeni karanlık ve kırmızı (Cyber Red) temayla açıldığını,
+2. Giriş yapıldığında sol taraftaki menünün ve avatarınızın aktif olduğunu,
+3. Hub ekranındaki animasyonların ve kartların kusursuz göründüğünü test edebilirsiniz.
+
+> [!WARNING]
+> Şablon (`base.html`) değiştiği için CRM Dashboard ve Form sayfaları (ikinci etaba kadar) dağınık veya şekilsiz görünebilir, bu beklenen bir durumdur. 
+
+İlk etap tasarım iskeletini nasıl buldunuz? Onayınızla birlikte **2. Etap: Formların (Giriş/Kayıt/Profil) Dönüşümü** aşamasına geçebilirim!

@@ -1,70 +1,92 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
 {% block title %}Yeni Müşteri Ekle{% endblock %}
+{% block header_title %}Yeni Müşteri Ekle{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-lg-8 mt-4">
-        <div class="card shadow-sm">
-            <div class="card-header bg-white">
-                <h4 class="mb-0 py-2">Yeni Müşteri Ekle</h4>
-            </div>
-            <div class="card-body p-4">
-                <form method="POST" action="">
-                    {{ form.hidden_tag() }}
-                    
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            {{ form.name.label(class="form-label") }}
-                            {{ form.name(class="form-control") }}
-                        </div>
-                        <div class="col-md-6">
-                            {{ form.surname.label(class="form-label") }}
-                            {{ form.surname(class="form-control") }}
-                        </div>
+<div class="flex justify-center mt-8 mb-8">
+    <div class="glass-card rounded-xl p-8 w-full max-w-2xl">
+        <div class="flex items-center gap-3 mb-6 border-b border-white/10 pb-4">
+            <span class="material-symbols-outlined text-[32px] text-primary">person_add</span>
+            <h3 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Müşteri Bilgileri</h3>
+        </div>
+        
+        <form method="POST" action="" novalidate class="flex flex-col gap-6">
+            {{ form.hidden_tag() }}
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Sol Kolon -->
+                <div class="flex flex-col gap-4">
+                    <div>
+                        {{ form.name.label(class="block font-label-md text-label-md text-on-surface-variant mb-1") }}
+                        {{ form.name(class="w-full bg-surface-container-high border border-white/10 rounded-md p-2 text-white focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors") }}
+                        {% for error in form.name.errors %}
+                            <span class="text-error text-sm mt-1 block">{{ error }}</span>
+                        {% endfor %}
                     </div>
-                    
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            {{ form.reference.label(class="form-label") }}
-                            {{ form.reference(class="form-control") }}
-                        </div>
-                        <div class="col-md-6">
-                            {{ form.birth_date.label(class="form-label") }}
-                            {{ form.birth_date(class="form-control", type="date") }}
-                        </div>
+                    <div>
+                        {{ form.surname.label(class="block font-label-md text-label-md text-on-surface-variant mb-1") }}
+                        {{ form.surname(class="w-full bg-surface-container-high border border-white/10 rounded-md p-2 text-white focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors") }}
+                        {% for error in form.surname.errors %}
+                            <span class="text-error text-sm mt-1 block">{{ error }}</span>
+                        {% endfor %}
                     </div>
+                    <div>
+                        {{ form.reference.label(class="block font-label-md text-label-md text-on-surface-variant mb-1") }}
+                        {{ form.reference(class="w-full bg-surface-container-high border border-white/10 rounded-md p-2 text-white focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors") }}
+                        {% for error in form.reference.errors %}
+                            <span class="text-error text-sm mt-1 block">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                    <div>
+                        {{ form.phone.label(class="block font-label-md text-label-md text-on-surface-variant mb-1") }}
+                        {{ form.phone(class="w-full bg-surface-container-high border border-white/10 rounded-md p-2 text-white focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors") }}
+                        {% for error in form.phone.errors %}
+                            <span class="text-error text-sm mt-1 block">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
 
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            {{ form.phone.label(class="form-label") }}
-                            {{ form.phone(class="form-control") }}
-                        </div>
-                        <div class="col-md-6">
-                            {{ form.district.label(class="form-label") }}
-                            {{ form.district(class="form-control") }}
-                        </div>
+                <!-- Sağ Kolon -->
+                <div class="flex flex-col gap-4">
+                    <div>
+                        {{ form.birth_date.label(class="block font-label-md text-label-md text-on-surface-variant mb-1") }}
+                        {{ form.birth_date(class="w-full bg-surface-container-high border border-white/10 rounded-md p-2 text-white focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors [color-scheme:dark]") }}
+                        {% for error in form.birth_date.errors %}
+                            <span class="text-error text-sm mt-1 block">{{ error }}</span>
+                        {% endfor %}
                     </div>
-
-                    <div class="mb-4">
-                        {{ form.profession.label(class="form-label") }}
-                        {{ form.profession(class="form-control") }}
+                    <div>
+                        {{ form.district.label(class="block font-label-md text-label-md text-on-surface-variant mb-1") }}
+                        {{ form.district(class="w-full bg-surface-container-high border border-white/10 rounded-md p-2 text-white focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors") }}
+                        {% for error in form.district.errors %}
+                            <span class="text-error text-sm mt-1 block">{{ error }}</span>
+                        {% endfor %}
                     </div>
-
+                    <div>
+                        {{ form.profession.label(class="block font-label-md text-label-md text-on-surface-variant mb-1") }}
+                        {{ form.profession(class="w-full bg-surface-container-high border border-white/10 rounded-md p-2 text-white focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors") }}
+                        {% for error in form.profession.errors %}
+                            <span class="text-error text-sm mt-1 block">{{ error }}</span>
+                        {% endfor %}
+                    </div>
                     {% if current_user.role == 'admin' %}
-                    <div class="mb-4 p-3 bg-light rounded border">
-                        <label class="form-label fw-bold text-danger">Sadece Admin: Arayıcı Ata</label>
-                        {{ form.assigned_user_id(class="form-select") }}
+                    <div>
+                        {{ form.assigned_user_id.label(class="block font-label-md text-label-md text-on-surface-variant mb-1") }}
+                        {{ form.assigned_user_id(class="w-full bg-surface-container-high border border-white/10 rounded-md p-2 text-white focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors") }}
+                        {% for error in form.assigned_user_id.errors %}
+                            <span class="text-error text-sm mt-1 block">{{ error }}</span>
+                        {% endfor %}
                     </div>
                     {% endif %}
-                    
-                    <div class="d-flex justify-content-between">
-                        <a href="{{ url_for('crm.dashboard') }}" class="btn btn-outline-secondary">İptal</a>
-                        {{ form.submit(class="btn btn-success") }}
-                    </div>
-                </form>
+                </div>
             </div>
-        </div>
+
+            <div class="mt-6 pt-6 border-t border-white/10 flex justify-end gap-4">
+                <a href="{{ url_for('crm.dashboard') }}" class="ruby-btn-secondary px-6 py-2 rounded-lg font-body-md text-body-md font-medium transition-colors text-center">İptal</a>
+                {{ form.submit(class="ruby-btn px-6 py-2 rounded-lg font-body-md text-body-md font-medium cursor-pointer transition-colors") }}
+            </div>
+        </form>
     </div>
 </div>
 {% endblock %}

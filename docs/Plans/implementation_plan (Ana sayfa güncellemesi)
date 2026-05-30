@@ -1,0 +1,48 @@
+# Cyber Gate Redux Tasarım Sistemi Entegrasyon Planı
+
+Yeni "Dark Tech Minimalism" ve "Glassmorphism" odaklı tasarım dosyanızı (code.html ve DESIGN.md) inceledim. Tüm uygulamanın bu agresif ve profesyonel (Cyber Red) tasarıma geçmesi için yapılması gerekenleri adım adım planladım.
+
+## User Review Required
+
+Lütfen uygulamanın klasik Bootstrap yapısından çıkarılıp tamamen Tailwind CSS ve özel CSS (Glassmorphism) mimarisine geçişini onaylayın. Tüm formların, tabloların ve uyarı (flash) mesajlarının bu yeni karanlık (dark) temaya uyarlanması gerekecektir. Plan detaylarını aşağıda görebilirsiniz.
+
+## Proposed Changes
+
+### 1. Ana Şablonun Kurulması (Base Template)
+
+#### [MODIFY] app/templates/base.html
+*   Mevcut Bootstrap 5 CDN'leri ve yapıları tamamen kaldırılacak.
+*   `code.html` içindeki Tailwind scripti, `tailwind-config` JSON ayarları ve `.glass-card`, `.ruby-btn` gibi özel CSS sınıfları `<head>` kısmına eklenecek.
+*   Arka planda oluşturulan "Ambient Glow" (kırmızımsı parlamalar) sayfaya entegre edilecek.
+*   Sabit Sol Menü (Sidebar) ve Üst Bar (TopAppBar) yapısı kurulacak:
+    *   **Sidebar:** Giriş yapılmamışsa gizlenecek veya kısıtlı gösterilecek. Giriş yapılmışsa (ve rolüne göre) dinamik linkler (Dashboard, Kullanıcı Ekle vb.) yer alacak.
+    *   **Üst Bar:** Kullanıcı avatarı/profili ve flash mesajların gösterildiği alan olarak kullanılacak.
+*   Ana içerik alanı `<main>` etiketi içerisinde `{% block content %}` olarak ayrılacak.
+
+### 2. Hub (Ana Portal) Ekranının Uyarlanması
+
+#### [MODIFY] app/templates/main/index.html
+*   `code.html` içindeki 6 adet Bento Grid modül kartı ("Müşteri Yönetimi", "Gelişmiş Raporlar", vb.) doğrudan bu sayfaya aktarılacak.
+*   Aktif olan CRM modülünün butonu `url_for('crm.dashboard')` rotasına bağlanacak.
+
+### 3. CRM ve Auth Sayfalarının Dönüşümü
+
+#### [MODIFY] app/templates/auth/login.html, register.html, profile.html
+*   Form kapları (container) `.glass-card` sınıfı ile sarmalanacak.
+*   Tüm `input` alanları tasarım sisteminde belirtildiği üzere "Dark charcoal fill (#1A1A1A) with 1px gray border that turns red on focus" kuralına göre Tailwind sınıflarıyla baştan yazılacak (`bg-surface-container-high border-white/10 focus:border-primary text-white`).
+*   Onay/Gönder butonları `.ruby-btn` sınıfına geçirilecek.
+
+#### [MODIFY] app/templates/crm/dashboard.html, add_customer.html, customer_detail.html
+*   **Tablolar:** Bootstrap tablosu kaldırılarak karanlık temaya uygun, şeffaf çizgili ve hover durumunda satırın hafif kırmızılaştığı (veya parladığı) özel tablolar oluşturulacak.
+*   **Arama Çubuğu ve Butonlar:** Yeni tasarıma uyumlu input ve `.ruby-btn` kullanılacak.
+*   **Sayfalandırma (Pagination):** Tailwind flex yapıları ve yarı saydam glass efektli butonlara dönüştürülecek.
+
+### 4. Hata Sayfalarının Güncellenmesi
+
+#### [MODIFY] app/templates/errors/404.html, 500.html
+*   Bu sayfalar da `.glass-card` kullanılarak merkezde gösterilecek şekilde güncellenecektir. Anasayfaya dönüş butonları `.ruby-btn` olacak.
+
+## Verification Plan
+1. `base.html` güncellendikten sonra tüm projenin Tailwind yapısını doğru yüklediği teyit edilecek.
+2. Login ekranına gidilerek form elemanlarının Glassmorphism tasarımına tam uyduğu kontrol edilecek.
+3. Giriş yapıp CRM tablosuna gidilerek Bootstrap kalıntıları aranacak ve tamamının temizlendiği, buton animasyonlarının (ruby-btn) kusursuz çalıştığı görülecek.

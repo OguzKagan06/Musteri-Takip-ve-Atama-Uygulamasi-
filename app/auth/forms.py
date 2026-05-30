@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, PasswordField, SubmitField
-from wtforms.validators import DataRequired, Length, EqualTo, ValidationError
+from wtforms.validators import DataRequired, Length, EqualTo, ValidationError, Optional
 from app.models import User
 from app import db
 
@@ -19,3 +20,9 @@ class LoginForm(FlaskForm):
     username = StringField('Kullanıcı Adı', validators=[DataRequired()])
     password = PasswordField('Şifre', validators=[DataRequired()])
     submit = SubmitField('Giriş Yap')
+
+class UpdateProfileForm(FlaskForm):
+    avatar = FileField('Profil Fotoğrafı', validators=[FileAllowed(['jpg', 'png', 'jpeg'], 'Sadece resim dosyaları yüklenebilir!')])
+    password = PasswordField('Yeni Şifre (Değiştirmek istemiyorsanız boş bırakın)', validators=[Optional(), Length(min=6)])
+    confirm_password = PasswordField('Yeni Şifreyi Onayla', validators=[EqualTo('password')])
+    submit = SubmitField('Güncelle')

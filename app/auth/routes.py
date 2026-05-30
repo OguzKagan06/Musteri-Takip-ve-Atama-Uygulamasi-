@@ -1,8 +1,11 @@
-from flask import render_template, redirect, url_for, flash, request
+import os
+import uuid
+from werkzeug.utils import secure_filename
+from flask import render_template, redirect, url_for, flash, request, current_app
 from flask_login import login_user, logout_user, current_user, login_required
 from app import db
 from app.auth import bp
-from app.auth.forms import LoginForm, RegisterForm
+from app.auth.forms import LoginForm, RegisterForm, UpdateProfileForm
 from app.models import User
 
 @bp.route('/login', methods=['GET', 'POST'])
@@ -42,3 +45,26 @@ def register():
         flash('Tebrikler, kayıt oldunuz! Şimdi giriş yapabilirsiniz.', 'success')
         return redirect(url_for('auth.login'))
     return render_template('auth/register.html', form=form)
+
+@bp.route('/profile', methods=['GET', 'POST'])
+@login_required
+def profile():
+    form = UpdateProfileForm()
+    if form.validate_on_submit():
+        if form.avatar.data:
+            avatar_file = form.avatar.data
+            filename = secure_filename(avatar_file.filename)
+            unique_filename = f"{uuid.uuid4().hex}_{filename}"
+            avatar_path = os.path.join(current_app.root_path, 'static', 'avatars')
+            os.makedirs(avatar_path, exist_ok=True)
+            avatar_file.save(os.path.join(avatar_path, unique_filename))
+            current_user.avatar_file = unique_filename
+            
+        if form.password.data:
+            current_user.set_password(form.password.data)
+            
+        db.session.commit()
+        flash('Profiliniz başarıyla güncellendi.', 'success')
+        return redirect(url_for('auth.profile'))
+        
+    return render_template('auth/profile.html', form=form)

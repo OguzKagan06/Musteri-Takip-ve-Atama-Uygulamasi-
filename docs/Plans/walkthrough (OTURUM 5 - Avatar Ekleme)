@@ -1,0 +1,34 @@
+# Kullanıcı Profili ve Avatar Yükleme Özelliği Tamamlandı
+
+İsteğinize uygun olarak, kullanıcıların hesaplarına giriş yaptıktan sonra şifrelerini değiştirebilecekleri ve profil fotoğrafları (avatar) yükleyebilecekleri "Profil Yönetimi" özelliği başarıyla projeye eklendi.
+
+## Yapılan Değişiklikler
+
+*   **1. Veritabanı Modeli Güncellemesi (`app/models.py`)**
+    *   `User` modeline `avatar_file` sütunu eklendi. Veritabanı tablolarınızda varsayılan olarak `default.jpg` değeri atanacak şekilde tanımlandı.
+
+*   **2. Formların Ayarlanması (`app/auth/forms.py`)**
+    *   `UpdateProfileForm` adında yeni bir form oluşturuldu.
+    *   Sadece görsel dosyalarına (`jpg`, `png`, `jpeg`) izin veren `FileAllowed` kısıtlamasına sahip bir `avatar` dosya alanı (FileField) eklendi.
+    *   Kullanıcının istemediği sürece şifre değiştirmesini zorunlu kılmamak adına, şifre alanları `Optional()` (opsiyonel) validatörü ile oluşturuldu.
+
+*   **3. Profil Rotası ve Dosya İşlemleri (`app/auth/routes.py`)**
+    *   `/profile` rotası oluşturuldu. Sadece giriş yapmış hesaplar `@login_required` ile erişebilir.
+    *   Kullanıcı yeni bir avatar yüklediğinde:
+        *   Önce dosyanın asıl ismi `secure_filename()` ile temizlenerek sunucuya zarar vermesi engellendi.
+        *   Üzerine dosya yazılmasını (çakışmaları) önlemek adına, ismin başına benzersiz bir `uuid.uuid4().hex` değeri eklendi.
+        *   Dosyalar `app/static/avatars/` klasörüne güvenli bir şekilde kaydedildi. Eğer klasör yoksa (`os.makedirs` kullanılarak) otomatik olarak oluşturulması sağlandı.
+    *   Kullanıcı formu yeni bir şifre girerek doldurduysa, mevcut şifre yeniden hash'lenerek başarıyla güncellendi.
+
+*   **4. Şık Arayüz ve UI (Templates)**
+    *   `app/templates/auth/profile.html`: Mobil cihazlarla tam uyumlu, ortalanmış modern bir Bootstrap 5 kart tasarımı oluşturuldu. Sayfa açıldığında mevcut resim yuvarlak hatlarla (`rounded-circle`) kullanıcının karşısına çıkarıldı.
+    *   `app/templates/base.html`: Navbar'daki sağ üst köşede yer alan "Hoş geldin" yazısının yerine tıklanabilir ve kullanıcının avatarını (dinamik olarak) getiren minik bir görsel eklendi.
+
+## Test ve Doğrulama
+Kodların sözdizimi doğrulamaları (Syntax Check) yapılmış olup dosyalar hatasız şekilde derlenebilmiştir.
+
+**ÖNEMLİ:** `User` modeline yeni bir sütun (`avatar_file`) eklendiği için sistemi denemeden önce mutlaka terminalden şu iki komutu çalıştırmalısınız:
+1. `flask db migrate -m "Avatar sutunu eklendi"`
+2. `flask db upgrade`
+
+Bu işlemin ardından, navbar'daki kullanıcı adınıza veya resminize tıklayarak `/profile` sayfasına gidip avatarınızı ve şifrenizi güncelleyebilirsiniz!

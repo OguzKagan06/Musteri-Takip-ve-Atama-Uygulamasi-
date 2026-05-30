@@ -16,7 +16,7 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
+                <ul class="navbar-nav ms-auto align-items-center">
                     {% if current_user.is_authenticated %}
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('crm.dashboard') }}">Dashboard</a>
@@ -26,11 +26,14 @@
                             <a class="nav-link" href="{{ url_for('auth.register') }}">Kullanıcı Ekle</a>
                         </li>
                         {% endif %}
-                        <li class="nav-item">
-                            <span class="nav-link text-white-50">Hoş geldin, {{ current_user.username }}</span>
+                        <li class="nav-item ms-lg-3">
+                            <a class="nav-link d-flex align-items-center" href="{{ url_for('auth.profile') }}">
+                                <img src="{{ url_for('static', filename='avatars/' + current_user.avatar_file) }}" alt="Avatar" class="rounded-circle me-2" style="width: 30px; height: 30px; object-fit: cover;">
+                                <span>{{ current_user.username }}</span>
+                            </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('auth.logout') }}">Çıkış Yap</a>
+                        <li class="nav-item ms-lg-2">
+                            <a class="nav-link text-danger" href="{{ url_for('auth.logout') }}">Çıkış Yap</a>
                         </li>
                     {% else %}
                         <li class="nav-item">

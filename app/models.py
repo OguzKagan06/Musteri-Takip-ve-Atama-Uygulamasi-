@@ -14,6 +14,7 @@ class User(UserMixin, db.Model):
     username: Mapped[str] = mapped_column(String(64), unique=True, index=True)
     password_hash: Mapped[str] = mapped_column(String(256))
     role: Mapped[str] = mapped_column(String(20), default='arayıcı')
+    avatar_file: Mapped[str] = mapped_column(String(120), default='default.jpg')
     
     # İlişkiler
     customers: Mapped[List["Customer"]] = relationship(back_populates="assigned_user", cascade="all, delete-orphan")

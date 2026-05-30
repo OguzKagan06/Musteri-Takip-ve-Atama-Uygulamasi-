@@ -1,0 +1,62 @@
+# Kullanıcı Profili ve Avatar Yükleme Planı
+
+Bu planda, kullanıcıların profil fotoğraflarını (avatar) ve şifrelerini güncelleyebilecekleri sayfanın altyapısı ve tasarımsal değişiklikleri yer almaktadır.
+
+## User Review Required
+
+Lütfen dosya yükleme mantığını, kullanılacak avatar dizin yapısını ve form detaylarını inceleyin. Eğer her şey uygunsa onayınızla birlikte kodlamaya başlayacağım. Yeni sütun ekleneceği için işlem bittikten sonra veritabanı migrasyonu yapmanız gerekeceğini unutmayın.
+
+## Proposed Changes
+
+### 1. Veritabanı Modelleri
+
+#### [MODIFY] app/models.py
+*   `User` sınıfına yeni bir sütun eklenecek: 
+    `avatar_file: Mapped[str] = mapped_column(String(120), default='default.jpg')`
+*   Veritabanı yapısı değiştiği için geliştirme tamamlandığında sizin tarafınızdan `flask db migrate` komutunun çalıştırılması gerekecek.
+
+---
+
+### 2. Formlar (Flask-WTF)
+
+#### [MODIFY] app/auth/forms.py
+*   `flask_wtf.file` modülünden `FileField` ve `FileAllowed` kütüphaneleri eklenecek.
+*   `UpdateProfileForm` sınıfı oluşturulacak:
+    *   `avatar`: `FileField('Profil Fotoğrafı', validators=[FileAllowed(['jpg', 'png', 'jpeg'], 'Sadece resim dosyaları yüklenebilir!')])`
+    *   `password`: `PasswordField('Yeni Şifre (Değiştirmek istemiyorsanız boş bırakın)', validators=[Optional(), Length(min=6)])`
+    *   `confirm_password`: `PasswordField('Yeni Şifreyi Onayla', validators=[EqualTo('password')])`
+    *   `submit`: `SubmitField('Güncelle')`
+
+---
+
+### 3. Rotalar ve Dosya Yükleme İşlemleri
+
+#### [MODIFY] app/auth/routes.py
+*   Gerekli kütüphaneler (`os`, `uuid`, `werkzeug.utils.secure_filename`, `current_app`) import edilecek.
+*   `@bp.route('/profile', methods=['GET', 'POST'])` ve `@login_required` rotası oluşturulacak.
+*   İş mantığı:
+    *   Form POST edildiğinde:
+        *   `form.avatar.data` var ise:
+            *   Benzersiz bir isim üretilecek: `uuid.uuid4().hex + '_' + secure_filename(...)`
+            *   Dizin kontrolü yapılacak: `avatar_path = os.path.join(current_app.root_path, 'static', 'avatars')` ve `os.makedirs(avatar_path, exist_ok=True)`.
+            *   Dosya dizine kaydedilecek (`save()`) ve `current_user.avatar_file` güncellenecek.
+        *   `form.password.data` var ise:
+            *   `current_user.set_password()` ile yeni şifre atanacak.
+        *   Tüm değişiklikler `db.session.commit()` ile veritabanına yazılacak ve Türkçe başarı mesajı (`flash`) verilecek.
+
+---
+
+### 4. Tasarım ve UI (Templates)
+
+#### [NEW] app/templates/auth/profile.html
+*   Bootstrap 5 kullanılarak, sol tarafta kullanıcının mevcut avatarını yuvarlak (`rounded-circle`, `img-thumbnail` class'ları ile) gösteren bir bölüm yapılacak.
+*   Sağ tarafta `UpdateProfileForm` barındırılacak. Form etiketi `enctype="multipart/form-data"` özelliğine sahip olacak (dosya yükleyebilmek için).
+
+#### [MODIFY] app/templates/base.html
+*   Navbar'da sağ üst köşeye (Hoş geldin metninin yanına veya yerine) kullanıcının mevcut avatarı eklenecek (`<img src="{{ url_for('static', filename='avatars/' + current_user.avatar_file) }}" class="rounded-circle" width="30" height="30">`).
+*   Bu resim ve kullanıcı adı aynı zamanda `/profile` sayfasına giden bir tıklanabilir bağlantı (`<a>`) içerisine alınacak.
+
+## Verification Plan
+1. Bu planın ardından kodlama yapılacak.
+2. Formda ve routelarda eksik kütüphane olmamasına özen gösterilecek.
+3. Size `flask db migrate` ve `upgrade` yapmanız hatırlatılarak özellik test edilebilir hale getirilecek.

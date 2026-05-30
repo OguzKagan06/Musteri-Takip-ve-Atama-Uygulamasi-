@@ -1,0 +1,32 @@
+# Kayıt (Register) Formu Hata Giderme Planı
+
+Kayıt formunun sessizce (hata vermeden) başarısız olmasına sebep olan WTForms doğrulama (validation) sorununu tespit edebilmek ve arayüzde görünür kılmak için gerekli güncellemeleri yapacağız.
+
+## User Review Required
+
+Aşağıdaki şablon ve rota eklemelerini lütfen inceleyip onaylayın.
+
+## Proposed Changes
+
+### app/templates/auth/register.html
+Görünmez güvenlik ihlallerini ve hataları çözmek için şablon güncellenecek.
+
+#### [MODIFY] app/templates/auth/register.html
+*   `<form>` etiketinin hemen altına CSRF koruması sağlayan `{{ form.hidden_tag() }}` kodu (eğer silinmiş veya eksikse) mutlaka eklenecek.
+*   Formda bulunan her bir girdi alanının (`username`, `password`, `confirm_password` ve varsa diğerleri) hemen altına Jinja döngüsü yerleştirilerek olası hataların koyu kırmızı bir metin (`<span class="text-error text-sm">{{ error }}</span>`) şeklinde arayüzde belirginleşmesi sağlanacak.
+
+### app/auth/routes.py
+Hatanın kaynağını terminal üzerinden teşhis edebilmek için debug (hata ayıklama) kodu eklenecek.
+
+#### [MODIFY] app/auth/routes.py
+*   `/register` rotasında bulunan `if form.validate_on_submit():` bloğunun sonrasına (başarısız olma durumunu yakalayacak şekilde) aşağıdaki kod parçacığı eklenecek:
+    ```python
+    if request.method == 'POST':
+        print("FORM HATALARI:", form.errors)
+    ```
+*   Bu sayede şifre uyuşmazlığı, boş alan veya CSRF eksikliği gibi durumların teknik arka planı direkt olarak terminal konsoluna yazdırılacak.
+
+## Verification Plan
+1. Admin hesabıyla yeni bir kayıt yapılmaya çalışılacak. (Örn: bilerek şifreleri farklı girerek form gönderilecek).
+2. Arayüzde karanlık temaya (Dark Tech) uygun bir şekilde kırmızı hata mesajlarının çıktığı doğrulanacak.
+3. Arka planda terminal ekranı (console) kontrol edilerek "FORM HATALARI: { ... }" çıktısının başarıyla loglandığı test edilecek.

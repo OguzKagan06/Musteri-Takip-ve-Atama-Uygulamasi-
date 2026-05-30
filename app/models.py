@@ -17,7 +17,7 @@ class User(UserMixin, db.Model):
     avatar_file: Mapped[str] = mapped_column(String(120), default='default.jpg')
     
     # İlişkiler
-    customers: Mapped[List["Customer"]] = relationship(back_populates="assigned_user", cascade="all, delete-orphan")
+    customers: Mapped[List["Customer"]] = relationship(back_populates="assigned_user", cascade="all, delete-orphan", foreign_keys="[Customer.assigned_user_id]")
     notes: Mapped[List["Note"]] = relationship(back_populates="user", cascade="all, delete-orphan")
     notifications: Mapped[List["Notification"]] = relationship(back_populates="user", cascade="all, delete-orphan")
 
@@ -41,12 +41,15 @@ class Customer(db.Model):
     district: Mapped[Optional[str]] = mapped_column(String(100))
     profession: Mapped[Optional[str]] = mapped_column(String(100))
     phone: Mapped[Optional[str]] = mapped_column(String(20))
+    call_status: Mapped[str] = mapped_column(String(50), default='Yeni Kayıt')
     
     # Foreign Key
     assigned_user_id: Mapped[Optional[int]] = mapped_column(ForeignKey('users.id'))
+    last_called_by_id: Mapped[Optional[int]] = mapped_column(ForeignKey('users.id'), nullable=True)
     
     # İlişkiler
-    assigned_user: Mapped[Optional["User"]] = relationship(back_populates="customers")
+    assigned_user: Mapped[Optional["User"]] = relationship(foreign_keys=[assigned_user_id], back_populates="customers")
+    last_caller: Mapped[Optional["User"]] = relationship(foreign_keys=[last_called_by_id])
     notes: Mapped[List["Note"]] = relationship(back_populates="customer", cascade="all, delete-orphan")
 
     def __repr__(self):

@@ -1,0 +1,54 @@
+# Müşteri Görüşme Durumu ve Takip Özelliği Planı
+
+Müşterilerinizin durumunu (arandı, ulaşıldı vb.) ve bu durumu en son güncelleyen temsilciyi (admin/arayıcı) kaydedip Dashboard tablosunda renkli rozetlerle (badge) göstereceğiz.
+
+## User Review Required
+
+Aşağıdaki veritabanı, form ve arayüz güncellemelerini lütfen inceleyip onaylayın.
+> [!WARNING]
+> Veritabanı modeli güncelleneceği için, bu özellik eklendikten sonra terminalde mutlaka `flask db migrate -m "Added call status"` ve `flask db upgrade` komutlarını çalıştırmanız gerekecek.
+
+## Proposed Changes
+
+### app/models.py
+Müşteri (Customer) tablosuna iki yeni özellik eklenecek.
+
+#### [MODIFY] app/models.py
+*   **Customer Modeli:**
+    *   `call_status`: String tipinde, varsayılanı (default) 'Yeni Kayıt' olan yeni bir sütun eklenecek.
+    *   `last_called_by_id`: User tablosuna referans veren (ForeignKey) ve boş bırakılabilir (nullable) bir sütun eklenecek.
+    *   `last_caller`: Veritabanından işlemi yapan User objesine erişebilmemiz için `relationship` tanımlanacak (Çakışmayı önlemek adına `foreign_keys=[last_called_by_id]` kullanılacak).
+
+### app/crm/forms.py
+Müşteri ekleme/düzenleme formlarına yeni bir alan eklenecek.
+
+#### [MODIFY] app/crm/forms.py
+*   **CustomerForm:**
+    *   `call_status`: Bir açılır liste (SelectField) olarak eklenecek. Seçenekler: 'Yeni Kayıt', 'Ulaşıldı', 'Telefonu Açmadı', 'Tekrar Aranacak' olacak.
+    *   *Not: Güvenlik gereği işlemi yapan kişinin seçimi (`last_called_by_id`) kesinlikle forma eklenmeyecek, arka planda rotadan otomatik atanacak.*
+
+### app/crm/routes.py
+Form gönderildiğinde veriyi kaydedecek arka plan mekanizması güncellenecek.
+
+#### [MODIFY] app/crm/routes.py
+*   **`new_customer` ve `edit_customer` Rotaları:**
+    *   Form doğrulandıktan sonra (POST işleminde), müşteriyi veritabanına eklemeden/güncellemeden hemen önce `customer.last_called_by_id = current_user.id` ataması yapılacak. Böylece "Son işlemi kim yaptı?" sorusunun cevabı kalıcı olarak saklanacak.
+
+### app/templates/crm/dashboard.html
+CRM listesine renkli durum etiketleri eklenecek.
+
+#### [MODIFY] app/templates/crm/dashboard.html
+*   **Dashboard Tablosu:**
+    *   Tablo başlığına (Telefon ile E-posta arasına) "Görüşme Durumu" eklenecek.
+    *   Sütun içerisine Tailwind kullanılarak şık rozetler (badge) çizilecek:
+        *   `Ulaşıldı` -> Yeşil (`bg-green-500/20 text-green-400`)
+        *   `Telefonu Açmadı` -> Kırmızı (`bg-red-500/20 text-red-400`)
+        *   `Tekrar Aranacak` -> Sarı (`bg-yellow-500/20 text-yellow-400`)
+        *   `Yeni Kayıt` -> Gri/Nötr (`bg-surface-variant text-on-surface-variant`)
+    *   Rozetin hemen yanına/altına, işlemi yapan kişi varsa `(admin)` formatında ismi yazılacak (`customer.last_caller.username`).
+
+## Verification Plan
+1. `flask db migrate` ve `flask db upgrade` komutları çalıştırılıp veritabanının güncellendiği teyit edilecek.
+2. Dashboard'a girilip tabloda eski müşteriler için "Yeni Kayıt" ibaresinin (varsayılan) sorunsuz göründüğü kontrol edilecek.
+3. Yeni müşteri eklenerek ve mevcut bir müşteri düzenlenerek "Ulaşıldı" veya "Tekrar Aranacak" gibi seçeneklerin kaydedilebildiği doğrulanacak.
+4. Müşteri durumu düzenlendiğinde işlemi yapan kullanıcının isminin rozet içerisinde parantezyle doğru biçimde yazıldığı test edilecek.

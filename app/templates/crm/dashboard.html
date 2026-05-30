@@ -36,6 +36,7 @@
                     <th class="p-4">Ad Soyad</th>
                     <th class="p-4">İlçe</th>
                     <th class="p-4">Telefon</th>
+                    <th class="p-4">Görüşme Durumu</th>
                     <th class="p-4 text-right">İşlemler</th>
                 </tr>
             </thead>
@@ -46,13 +47,29 @@
                     <td class="p-4 text-on-surface font-medium">{{ customer.name }} {{ customer.surname }}</td>
                     <td class="p-4 text-on-surface-variant">{{ customer.district or '-' }}</td>
                     <td class="p-4 text-on-surface-variant">{{ customer.phone or '-' }}</td>
+                    <td class="p-4 text-sm">
+                        {% if customer.call_status == 'Ulaşıldı' %}
+                            <span class="inline-block px-2 py-1 rounded-full bg-green-500/20 text-green-400 font-medium">
+                        {% elif customer.call_status == 'Telefonu Açmadı' %}
+                            <span class="inline-block px-2 py-1 rounded-full bg-red-500/20 text-red-400 font-medium">
+                        {% elif customer.call_status == 'Tekrar Aranacak' %}
+                            <span class="inline-block px-2 py-1 rounded-full bg-yellow-500/20 text-yellow-400 font-medium">
+                        {% else %}
+                            <span class="inline-block px-2 py-1 rounded-full bg-surface-variant text-on-surface-variant font-medium">
+                        {% endif %}
+                            {{ customer.call_status }}
+                        </span>
+                        {% if customer.last_caller %}
+                            <div class="text-xs text-on-surface-variant mt-1 opacity-70">({{ customer.last_caller.username }})</div>
+                        {% endif %}
+                    </td>
                     <td class="p-4 text-right">
                         <a href="{{ url_for('crm.customer_detail', id=customer.id) }}" class="inline-block px-3 py-1 rounded text-primary hover:bg-primary/10 border border-transparent hover:border-primary/20 transition-colors">Detay</a>
                     </td>
                 </tr>
                 {% else %}
                 <tr>
-                    <td colspan="5" class="p-8 text-center text-on-surface-variant">Kayıtlı müşteri bulunamadı.</td>
+                    <td colspan="6" class="p-8 text-center text-on-surface-variant">Kayıtlı müşteri bulunamadı.</td>
                 </tr>
                 {% endfor %}
             </tbody>

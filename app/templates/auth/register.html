@@ -27,6 +27,13 @@
                 {% endfor %}
             </div>
             <div>
+                {{ form.confirm_password.label(class="block font-label-md text-label-md text-on-surface-variant mb-1") }}
+                {{ form.confirm_password(class="w-full bg-surface-container-high border border-white/10 rounded-md p-2 text-white focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors") }}
+                {% for error in form.confirm_password.errors %}
+                    <span class="text-error text-sm mt-1 block">{{ error }}</span>
+                {% endfor %}
+            </div>
+            <div>
                 {{ form.role.label(class="block font-label-md text-label-md text-on-surface-variant mb-1") }}
                 {{ form.role(class="w-full bg-surface-container-high border border-white/10 rounded-md p-2 text-white focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none transition-colors") }}
                 {% for error in form.role.errors %}

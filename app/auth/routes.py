@@ -44,6 +44,10 @@ def register():
         db.session.commit()
         flash('Tebrikler, kayıt oldunuz! Şimdi giriş yapabilirsiniz.', 'success')
         return redirect(url_for('auth.login'))
+        
+    if request.method == 'POST':
+        print("FORM HATALARI:", form.errors)
+        
     return render_template('auth/register.html', form=form)
 
 @bp.route('/profile', methods=['GET', 'POST'])

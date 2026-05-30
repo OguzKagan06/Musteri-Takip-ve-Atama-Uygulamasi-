@@ -333,7 +333,21 @@ Hata 1: Yeni kayıt sayfası yüklenirken jinja2.exceptions.UndefinedError: 'app
 Tasarımda yer alan sağ üstteki statik bildirim zilini veritabanı ile bağlayarak dinamik, işlevsel ve gerçek zamanlı bir bildirim (Notification) sistemine dönüştürmek.
 
 ### Verdiğim Promptlar
-1. "Projemize yeni Tailwind tabanlı karanlık (dark) temayı entegre ettik. Şimdi sağ üstteki statik bildirim zilini arka uçla (backend) bağlayarak dinamik hale getireceğiz. Hedef: Kullanıcılara bildirim gönderebilen ve okunmamış sayısını gösteren açılır menülü bir sistem kurmak..."
+Bağlam: Adminlerin bildirim gönderme paneli sorunsuz çalışıyor. Şimdi bu panele tek tuşla herkese duyuru (broadcast) yapabilme özelliği ekleyeceğiz.
+
+Hedef: Adminin form üzerinden "Tüm Arayıcılar" seçeneğini seçerek sistemdeki herkese aynı anda toplu bildirim gönderebilmesini sağlamak.
+
+Adımlar:
+1. app/main/routes.py: `/admin/send-notification` rotasını güncelle.
+   - Form başlatılırken `form.user_id.choices` listesinin en başına dinamik olarak `('all', 'Tüm Arayıcılar (Toplu Duyuru)')` seçeneğini ekle (Listeye `.insert(0, ...)` yapabilirsin).
+   - Form POST edildiğinde bir `if-else` mantığı kur:
+     - Eğer `form.user_id.data == 'all'` ise: `db.select(User).where(User.id != current_user.id)` ile admin hariç tüm kullanıcıları çek. Bir `for` döngüsü ile her birine yeni bir `Notification` oluşturup `db.session.add()` yap.
+     - Eğer spesifik bir ID geldiyse: Sadece o `user_id` değerine sahip kişiye `Notification` oluştur (Eski mantık).
+   - İşlem bitince `db.session.commit()` yap ve duruma uygun (Toplu duyuru / Kişisel bildirim) bir başarı flash mesajı göster.
+
+Kısıtlar:
+- Plan modunda ilerle ve onayımı bekle.
+- SQLAlchemy 2.x standartlarını kullanmaya devam et.
 
 ### Ajanın Önerdiği Plan
 Ajan, veritabanına `Notification` modeli ekleyip bunu `User` modeliyle `cascade` (otomatik silinme) ilişkisine bağladı. Bildirimlerin her sayfada görünebilmesi için Flask'ın `@bp.app_context_processor` dekoratörünü kullanarak global değişkenler (`unread_notifications_count`) oluşturdu. Frontend (arayüz) tarafında ise açılır menü (dropdown) animasyonları için jQuery yerine çok daha hafif ve modern olan Alpine.js kütüphanesini tercih etti.
@@ -347,3 +361,29 @@ Backend tarafında, her sayfaya (`render_template`) ayrı ayrı veri göndermek 
 ### Ekstra Geliştirme: Toplu Bildirim (Broadcast) Altyapısı
 - **Fikir:** Adminin sadece tekil kullanıcılara değil, tüm ekibe aynı anda sistem içi duyuru yapabilmesi gerektiğini düşündüm.
 - **Uygulama:** Ajanı yönlendirerek bildirim formundaki seçiciye (SelectField) 'Tüm Arayıcılar' parametresini (`'all'`) eklettim. Backend rotasında bu parametre yakalandığında, SQLAlchemy ile admin hariç tüm kullanıcıları çeken ve bir `for` döngüsü içinde herkese aynı anda bildirim (Notification) objesi üreten dinamik bir broadcast mekanizması kurdum. Bu sayede çağrı merkezindeki tüm ekibe anlık duyuru geçilebilmesinin önü açıldı.
+
+## Oturum 11 [31/05/2026]
+### Hedef
+Uzun bildirim mesajlarının sağ üstteki açılır menü (dropdown) tasarımını bozmasını engellemek ve kullanıcılara rahat bir okuma deneyimi sunmak için bir Bildirim Detay Sayfası oluşturulması.
+
+### Verdiğim Promptlar
+Bağlam: Bildirim dropdown (açılır menü) arayüzünde uzun mesajlar tasarımı (barı) bozuyor. Tıklanınca mesajın rahatça okunabilmesi için bir detay sayfası oluşturacağız.
+
+Hedef: Dropdown içindeki uzun mesajları kısaltarak arayüzün bozulmasını engellemek ve bildirime tıklandığında tam metnin okunabileceği şık bir detay sayfası sunmak.
+
+Adımlar:
+1. app/templates/base.html: Dropdown menüsü içindeki bildirim mesajı metnine Tailwind'in `line-clamp-2`, `whitespace-normal` ve `break-words` class'larını ekle. Böylece uzun mesajlar tasarımı bozmadan 2 satırda "..." ile kesilsin.
+2. app/main/routes.py: `/notifications/read/<int:id>` rotasını güncelle. Bildirimi `is_read = True` yapıp `db.session.commit()` ettikten sonra sadece geri yönlendirmek (redirect) YERİNE, `render_template('main/notification_detail.html', notification=notification)` komutuyla yeni bir sayfayı render et.
+3. app/templates/main/notification_detail.html: Karanlık (dark tech) temamıza ve Glassmorphism kart yapımıza uygun yeni bir sayfa oluştur. Bu sayfada:
+   - Bildirimin tam metni rahat okunacak bir font büyüklüğüyle (`text-body-md` veya üstü) yer alsın.
+   - Bildirimin gönderilme tarihi (timestamp) şık bir formatta bulunsun.
+   - Altında "Dashboard'a Dön" şeklinde bir yönlendirme butonu (ruby-btn) olsun.
+
+Kısıtlar:
+- Plan modunda ilerle ve onayımı bekle.
+
+### Ajanın Önerdiği Plan
+Ajan; dropdown içindeki paragraf etiketine Tailwind'in `line-clamp-2` ve `break-words` sınıflarını ekleyerek metni estetik bir şekilde kırpmayı planladı. Arka uçta (backend) ise `/notifications/read/<id>` rotasını güncelleyerek, okundu işaretlemesinden sonra kullanıcının tam metni, gönderim zamanını ve geri dönüş butonunu görebileceği yeni bir `notification_detail.html` şablonu render etmesini tasarladı.
+
+### Bu Oturumdan Öğrendiğim
+Frontend tarafında `line-clamp` gibi CSS/Tailwind özelliklerinin dinamik veri taşmalarını önlemedeki kritik rolünü ve bir web uygulamasında kullanıcı deneyimini (UX) iyileştirmek için verileri aşamalı olarak (önce özet/kırpılmış, sonra tam detay sayfası) göstermenin önemini kavradım.

@@ -11,7 +11,13 @@ class CustomerForm(FlaskForm):
     profession = StringField('Meslek', validators=[Optional()])
     phone = StringField('Telefon', validators=[Optional()])
     assigned_user_id = SelectField('Atanacak Arayıcı', coerce=int, validators=[Optional()])
-    submit = SubmitField('Müşteri Ekle')
+    call_status = SelectField('Görüşme Durumu', choices=[
+        ('Yeni Kayıt', 'Yeni Kayıt'), 
+        ('Ulaşıldı', 'Ulaşıldı'), 
+        ('Telefonu Açmadı', 'Telefonu Açmadı'), 
+        ('Tekrar Aranacak', 'Tekrar Aranacak')
+    ], validators=[DataRequired()], default='Yeni Kayıt')
+    submit = SubmitField('Kaydet')
 
 class NoteForm(FlaskForm):
     content = TextAreaField('Görüşme Notu', validators=[DataRequired()])

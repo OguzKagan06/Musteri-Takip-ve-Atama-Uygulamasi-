@@ -49,7 +49,9 @@ def new_customer():
             birth_date=form.birth_date.data,
             district=form.district.data,
             profession=form.profession.data,
-            phone=form.phone.data
+            phone=form.phone.data,
+            call_status=form.call_status.data,
+            last_called_by_id=current_user.id
         )
         
         assigned_id = form.assigned_user_id.data
@@ -102,3 +104,45 @@ def delete_customer(id):
     db.session.commit()
     flash('Müşteri ve ilgili notlar başarıyla silindi.', 'success')
     return redirect(url_for('crm.dashboard'))
+
+@bp.route('/customer/<int:id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit_customer(id):
+    customer = db.session.get(Customer, id)
+    if customer is None:
+        flash('Müşteri bulunamadı.', 'danger')
+        return redirect(url_for('crm.dashboard'))
+        
+    if current_user.role != 'admin' and customer.assigned_user_id != current_user.id:
+        flash('Bu müşteriyi düzenleme yetkiniz yok.', 'danger')
+        return redirect(url_for('crm.dashboard'))
+        
+    form = CustomerForm(obj=customer)
+    
+    if current_user.role == 'admin':
+        users = db.session.scalars(db.select(User).where(User.role == 'arayıcı')).all()
+        form.assigned_user_id.choices = [(u.id, u.username) for u in users]
+        form.assigned_user_id.choices.insert(0, (0, 'Atanmadı'))
+    else:
+        form.assigned_user_id.choices = [(current_user.id, current_user.username)]
+        
+    if form.validate_on_submit():
+        customer.reference = form.reference.data
+        customer.name = form.name.data
+        customer.surname = form.surname.data
+        customer.birth_date = form.birth_date.data
+        customer.district = form.district.data
+        customer.profession = form.profession.data
+        customer.phone = form.phone.data
+        customer.call_status = form.call_status.data
+        customer.last_called_by_id = current_user.id
+        
+        if current_user.role == 'admin':
+            assigned_id = form.assigned_user_id.data
+            customer.assigned_user_id = assigned_id if assigned_id != 0 else None
+            
+        db.session.commit()
+        flash('Müşteri başarıyla güncellendi.', 'success')
+        return redirect(url_for('crm.customer_detail', id=customer.id))
+        
+    return render_template('crm/add_customer.html', form=form, edit_mode=True)

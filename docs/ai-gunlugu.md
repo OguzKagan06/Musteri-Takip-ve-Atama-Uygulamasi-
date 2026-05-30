@@ -289,3 +289,41 @@ Ajan, `/` rotasını güncelleyerek giriş yapan kullanıcıları doğrudan CRM 
 
 ### Bu Oturumdan Öğrendiğim
 Geniş çaplı uygulamalarda (ERP/CRM) kullanıcıyı bir "Hub" ekranında karşılamanın kullanıcı deneyimi (UX) açısından çok daha profesyonel olduğunu gördüm. Ayrıca CSS/Bootstrap flexbox mimarisinin sayfa düzenini sağlama konusundaki gücünü (sticky footer) pratik bir şekilde deneyimledim.
+
+## Oturum 9 [31/05/2026]
+### Hedef
+Harici olarak tasarlanan "Dark Tech Minimalism" (Cyber Gate Redux) arayüzünün (HTML/CSS) projeye entegre edilmesi ve Flask backend yapısının bu yeni tasarıma senkronize edilmesi.
+
+### Verdiğim Promptlar
+Bağlam: Tasarım sistemi projeye entegre edildi ancak şifre güncelleme alanında bir uyumsuzluk var.
+
+Hedef: Profil sayfasına girmeye çalıştığımda aldığım jinja2.exceptions.UndefinedError: 'app.auth.forms.UpdateProfileForm object' has no attribute 'new_password' hatasını çözmek.
+
+Adımlar:
+
+Arayüzü güncellerken profile.html şablonuna new_password alanı eklendiğini, ancak app/auth/forms.py içindeki UpdateProfileForm sınıfında bu alanın eksik olduğunu fark ettim.
+
+app/auth/forms.py dosyasını aç ve UpdateProfileForm sınıfındaki password alanının adını tasarım sistemine uygun olarak new_password olarak değiştir.
+
+Backend'deki routes.py içinde şifre kaydetme ve hashleme işlemini de buna göre düzelt.
+
+### Ajanın Önerdiği Plan
+Ajan, arayüzdeki adlandırmaya sadık kalarak forms.py dosyasındaki şifre alanının adını (new_password) değiştirmeyi ve onaylayıcıyı (validator) EqualTo('new_password') olarak güncellemeyi planladı. Aynı zamanda /profile rotasında veritabanına kayıt işlemi yapılırken çağrılan veriyi de bu yeni isme göre bağlamayı sundu.
+
+### Plan'da Sorguladıklarım
+Ajan ilk başta sadece görsel tasarımı (HTML) güncelleyip arka plandaki (Python) mantığı unutmuştu. Hatayı tespit ettikten sonra ajanın sunduğu onarım planını inceledim. Şifre değiştirme işlemi sırasında, şifrenin veritabanına düz metin olarak kaydedilmemesi ve generate_password_hash işlemlerinin rotada bozulmadan kalması gerektiğini özellikle kontrol ettim ve onayladım.
+
+### Bu Oturumdan Öğrendiğim
+Görsel arayüz tasarımlarını (HTML/Jinja2) değiştirirken sadece frontend'in değil, Jinja2 şablonlarına gönderilen backend değişkenlerinin (Flask-WTF Form sınıflarının) de isimlerinin birebir eşleşmesi gerektiğini uygulamalı olarak tecrübe ettim.
+
+### Karşılaştığım Hatalar ve Çözümler
+Hata 1: Yeni arayüz şablonu render edilirken UndefinedError: 'app.auth.forms.UpdateProfileForm object' has no attribute 'new_password' hatasıyla karşılaştım.
+
+Çözüm 1: Hatanın, HTML şablonunda input adının new_password, Python form sınıfında ise password olmasından kaynaklı senkronizasyon problemi olduğunu tespit ettim. Çözüm olarak arka plandaki app/auth/forms.py dosyasına girerek UpdateProfileForm içindeki değişkeni tasarım sistemine uyumlu olacak şekilde değiştirdim ve routes.py içindeki hashleme mantığını yeni isme göre güncelledim.
+
+## Güncelleme Hatatı [31/05/2026]
+
+### Karşılaştığım Hatalar ve Çözümler
+Hata 1: Yeni kayıt sayfası yüklenirken jinja2.exceptions.UndefinedError: 'app.auth.forms.RegisterForm object' has no attribute 'role' hatası aldım.
+
+Çözüm 1: Hatanın, şablonda bulunan ancak backend form sınıfında tanımlanmayan bir alandan kaynaklandığını buldum. Bu alanın projede bir güvenlik açığı yaratacağını değerlendirerek, arka plana eklemek yerine app/templates/auth/register.html dosyasındaki ilgili frontend kod bloğunu ajana sildirerek hem hatayı çözdüm hem de sistemi güvenceye aldım.

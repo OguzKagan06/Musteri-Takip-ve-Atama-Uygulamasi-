@@ -1,0 +1,39 @@
+# Cyber Gate Redux: Tasarım Sistemi Tamamlandı
+
+Vibe Coding prensibiyle ilerlediğimiz tasarım entegrasyon sürecinin son (2.) etabını da başarıyla tamamladık. Projedeki tüm kalıntı Bootstrap 5 yapıları temizlendi ve "Dark Tech Minimalism" anlayışıyla kodlanmış Glassmorphism yapılarına dönüştürüldü.
+
+## 1. Etap Özeti (Hub & Base)
+*   **Base:** Özel arka plan kırmızı "Ambient Glow" efekti, dinamik `SideNavBar` ve `TopAppBar` eklendi.
+*   **Hub (Ana Portal):** Grid kartları ve zıplama (hover) efektleriyle "Çok Yakında" modülleri oluşturuldu.
+
+## 2. Etap Özeti (Formlar, CRM & Hatalar)
+
+*   **Auth Formları (`login.html`, `register.html`, `profile.html`)**
+    *   Formlar, merkezlenmiş `.glass-card` yapılarıyla sarmalandı.
+    *   Input alanlarına "Dark charcoal fill" konsepti uygulandı (`bg-surface-container-high border-white/10`). Tıklandığında kırmızıya (`focus:ring-primary`) dönen neon efektler eklendi.
+    *   Profil sayfasında kullanıcının avatarının etrafına özel bir kırmızı gölge (shadow) verildi ve dosya seçme input'u (file picker) Tailwind pseudo-class'ları (`file:mr-4 file:rounded-md`) ile şıklaştırıldı.
+
+*   **CRM Dashboard (`dashboard.html`)**
+    *   Müşteri listesindeki klasik Bootstrap tablosu iptal edilip, karanlık temaya ve mobil uyumlu `overflow-x-auto` yapısına dönüştürüldü.
+    *   Tablo satırlarında üzerine gelindiğinde (hover) arka planda hafif bir kırmızı parlamaya (`hover:bg-primary/5`) sahip "hover state" oluşturuldu.
+    *   Pagination (Sayfalandırma) alanı, Bootstrap sınıflarından temizlenip saydam kenarlıklı, aktif sayfanın kırmızı arka planla (`bg-primary/20`) öne çıktığı teknolojik bir buton kümesine dönüştürüldü.
+
+*   **CRM Detay Sayfaları (`add_customer.html`, `customer_detail.html`)**
+    *   Müşteri ekleme formunda "Grid (Izgara)" sistemi kullanılarak içerik sol ve sağ kolonlara dengeli dağıtıldı.
+    *   Müşteri detay ekranında "Görüşme Geçmişi" notları, sol kenarında kırmızı neon şerit taşıyan (`border-l-4 border-l-primary/50`) özel glass-card modüllerine dönüştürüldü. "Sil" butonu tehlike arz ettiği için kırmızı tonla (`bg-red-500/20 text-red-400`) belirginleştirildi.
+
+*   **Hata Sayfaları (`404.html`, `500.html`)**
+    *   Sıradan metinler yerine büyük Material Symbols ikonları, `font-display-lg` ile oluşturulmuş devasa hata kodları ve kırmızı transparan çerçeveli (`border-dashed border-primary/30`) ekranlar oluşturuldu.
+
+## 3. Hata Giderimleri (Bug Fixes)
+*   **Profil Şifre Güncelleme Hatası:** Şablondaki `new_password` alanı ile arka plandaki `password` değişkeninin uyuşmazlığından kaynaklanan `UndefinedError` giderildi.
+    *   `app/auth/forms.py` içerisindeki şifre alanları `new_password` olarak revize edildi.
+    *   `app/auth/routes.py` rotası şifre değişiminde yeni değişkeni `current_user.set_password(form.new_password.data)` şeklinde yakalayıp, veritabanına yine güvenli bir şekilde `werkzeug.security` (generate_password_hash) kullanarak şifrelemeye devam edecek şekilde onarıldı.
+*   **Kullanıcı Kayıt (Rol) Hatası:** `register.html` sayfasındaki `role` alanının eksikliğinden kaynaklanan `UndefinedError` giderildi.
+    *   `app/auth/forms.py` dosyasına `SelectField` import edilerek, "arayıcı" ve "admin" seçeneklerini barındıran `role` alanı eklendi.
+    *   `app/auth/routes.py` içinde yeni kayıt esnasında seçilen rolün de `User(..., role=form.role.data)` ile veritabanına kaydedilmesi sağlandı.
+
+## Doğrulama
+Bütün form sayfalarında CSRF (`{{ form.hidden_tag() }}`) tokenları ve Python validation (WTForms) hataları korunarak, tasarım hataları gösterecek şekilde ("text-error text-sm") yeniden entegre edildi. Yönlendirmeler (`url_for`) hiçbir şekilde bozulmadı.
+
+Tüm sistem artık saf, modern ve tek bir tasarım diline sadık şekilde çalışmaktadır. Geliştirme sunucunuzu çalıştırarak (`flask run`) yeni CRM ekranınızın tadını çıkarabilirsiniz!

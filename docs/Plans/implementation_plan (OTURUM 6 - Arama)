@@ -1,0 +1,51 @@
+# Dashboard Arama Özelliği (Search) Planı
+
+Bu planda, kullanıcıların yetkileri dahilindeki müşteriler arasında ad, soyad ve referans koduna göre filtreleme yapabilmesini sağlayan arama motorunun entegrasyon adımları yer almaktadır.
+
+## User Review Required
+
+Lütfen arama algoritmamızı ve eklenecek olan arama çubuğunun yapısını inceleyin. Sorgularda sizin de belirttiğiniz gibi `SQLAlchemy 2.x` standardına bağlı kalınmış, ancak modelimizdeki mevcut alan isimlerine uygun olarak (`first_name` yerine `name`, `last_name` yerine `surname`, `reference_code` yerine `reference`) revize edilmiştir. Onayınızla birlikte kodları güncelleyeceğim.
+
+## Proposed Changes
+
+### 1. Rota Güncellemesi (Arama Algoritması)
+
+#### [MODIFY] app/crm/routes.py
+*   `sqlalchemy` kütüphanesinden `or_` operatörü import edilecek.
+*   `/dashboard` rotasında `request.args.get('q')` kullanılarak URL üzerinden arama parametresi yakalanacak.
+*   **SQLAlchemy 2.x Stili ile RBAC Filtrelemesi**:
+    ```python
+    q = request.args.get('q')
+    query = db.select(Customer)
+    
+    # Mevcut RBAC kontrolü
+    if current_user.role != 'admin':
+        query = query.where(Customer.assigned_user_id == current_user.id)
+        
+    # Arama Terimi Kontrolü
+    if q:
+        search_filter = or_(
+            Customer.name.ilike(f'%{q}%'),
+            Customer.surname.ilike(f'%{q}%'),
+            Customer.reference.ilike(f'%{q}%')
+        )
+        query = query.where(search_filter)
+        
+    customers = db.session.scalars(query).all()
+    ```
+*   Template'e gönderilen değişkenlere `q=q` parametresi de eklenecek ki arayüzde önceki arama terimi gösterilebilsin.
+
+---
+
+### 2. UI ve Tasarım Güncellemeleri
+
+#### [MODIFY] app/templates/crm/dashboard.html
+*   Müşteriler başlığının hemen altına (tablonun üstüne) Bootstrap 5 `input-group` bileşeni kullanılarak şık bir arama formu (`<form method="GET">`) eklenecek.
+*   Arama formunun özellikleri:
+    *   `<input type="text" name="q" value="{{ q or '' }}">` ile yapılan arama kelimesi kutuda yazılı kalacak.
+    *   Eğer bir arama yapıldıysa (yani `q` değeri varsa), arama çubuğunun yanına/altına **"{{ q }} için arama sonuçları"** yazısı ve filtreyi sıfırlamak (Dashboard'un kök dizinine, parametresiz geri dönmek) için **"Aramayı Temizle"** butonu (`<a href="{{ url_for('crm.dashboard') }}">`) eklenecek.
+
+## Verification Plan
+1. Değişiklikler uygulandıktan sonra, yetkili bir arayıcı ile deneme yapılacak.
+2. Sadece kendi yetkisindeki müşterilerin arama sonucunda gelip gelmediği (RBAC'in delinip delinmediği) doğrulanacak.
+3. Ad, soyad ve referans parametrelerinin üçüyle de başarılı sonuç alınıp alınmadığı teyit edilecek.

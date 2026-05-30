@@ -8,6 +8,21 @@
     <a href="{{ url_for('crm.new_customer') }}" class="btn btn-primary">Yeni Müşteri Ekle</a>
 </div>
 
+<div class="mb-4">
+    <form method="GET" action="{{ url_for('crm.dashboard') }}">
+        <div class="input-group shadow-sm">
+            <input type="text" name="q" class="form-control" placeholder="Ad, Soyad veya Referans Ara..." value="{{ q or '' }}">
+            <button class="btn btn-primary" type="submit">Ara</button>
+        </div>
+    </form>
+    {% if q %}
+        <div class="mt-2 text-muted small d-flex justify-content-between">
+            <span><strong>"{{ q }}"</strong> için arama sonuçları.</span>
+            <a href="{{ url_for('crm.dashboard') }}" class="text-decoration-none text-danger">Aramayı Temizle</a>
+        </div>
+    {% endif %}
+</div>
+
 <div class="card shadow-sm">
     <div class="card-body">
         <table class="table table-hover mb-0">

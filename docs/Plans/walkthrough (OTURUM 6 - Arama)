@@ -1,0 +1,20 @@
+# Dashboard Arama (Search) Özelliği Tamamlandı
+
+Planladığımız gibi, kullanıcıların CRM panosu üzerinde yetkileri dahilindeki müşteriler arasında hızlıca arama yapmasını sağlayacak özellik projeye entegre edildi.
+
+## Yapılan Değişiklikler
+
+*   **1. Arama Algoritması (`app/crm/routes.py`)**
+    *   `/dashboard` rotasına URL parametrelerini (`?q=aranan_kelime`) yakalama yeteneği kazandırıldı.
+    *   `SQLAlchemy 2.x` standardına bağlı kalınarak `db.select()` sorgusu genişletildi. Mevcut yetkilendirme (RBAC) filtrelerinin (örneğin sadece kendi müşterilerini görebilme kısıtının) üzerine eklenecek şekilde `or_` operatörü ile bir arama filtresi oluşturuldu.
+    *   Sistem artık girilen kelimeyi eş zamanlı olarak müşterinin `name`, `surname` ve `reference` (referans kodu) alanlarında esnek (`ilike` metodu sayesinde büyük/küçük harf duyarsız) bir şekilde tarayabiliyor.
+
+*   **2. Arayüz Güncellemesi (`app/templates/crm/dashboard.html`)**
+    *   Müşteri tablosunun üst kısmına Bootstrap 5 form elemanları (`input-group`) kullanılarak şık bir arama çubuğu yerleştirildi.
+    *   Form çalıştırıldığında (arama yapıldığında), girilen değer silinmeyerek kutunun içinde yazılı bırakılıyor.
+    *   Kullanıcıyı bilgilendirmek adına hemen alta `"X" için arama sonuçları` mesajı ve aramayı iptal edip tüm listeye dönmesini sağlayacak kırmızı renkli şık bir `"Aramayı Temizle"` butonu yerleştirildi.
+
+## Test ve Doğrulama
+Dosyaların sözdizimi doğrulamasını (syntax check) yaptım ve herhangi bir hata bulunamadı. Veritabanı modelinizde bir yapı değişikliği olmadığı için **ekstra bir migrasyon işlemi yapmanıza gerek yoktur**.
+
+Şimdi uygulamanızı `flask run` ile başlatabilir, Dashboard sekmesine giderek yeni eklenen Arama çubuğunu test edebilirsiniz!

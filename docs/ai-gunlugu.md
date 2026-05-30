@@ -147,3 +147,47 @@ Yazılım mimarisinde "business logic" (iş mantığı) açıklarını -örneği
 ### Karşılaştığım Hatalar ve Çözümler
 - **Hata:** Sisteme kendi oluşturduğum "admin" hesabımla girmeme rağmen, Müşteri Ekleme sayfasında "Atanacak Arayıcı" alanını göremedim ve arayüzde yetkisiz kullanıcı gibi sınırlandırıldım.
 - **Çözüm:** Sorunu analiz ettiğimde, RBAC (Yetkilendirme) sistemini kurmadan önceki aşamada oluşturduğum bu "admin" kullanıcısının, veritabanına varsayılan olarak "arayıcı" rolüyle kaydedildiğini fark ettim. Terminalden `flask shell` komutunu başlatarak SQLAlchemy üzerinden bu kullanıcının profilini çektim (`db.session.scalar`) ve rolünü doğrudan `'admin'` olarak güncelleyip veritabanına işleyerek (`db.session.commit()`) yetkilendirme sorununu çözdüm.
+
+## Oturum 5 [30/05/2026]
+### Hedef
+Kullanıcıların kendi şifrelerini güncelleyebilecekleri ve profil fotoğraflarını (avatar) yükleyebilecekleri Profil sayfasının sisteme entegre edilmesi.
+
+### Verdiğim Promptlar
+Bağlam: CRM ve RBAC sistemlerimiz sorunsuz çalışıyor. Şimdi "Kullanıcı Profili ve Avatar Yükleme" bonus özelliğini ekleyeceğiz.
+
+Hedef: Kullanıcıların şifrelerini değiştirebileceği ve profil fotoğraflarını (avatar) güncelleyebileceği bir profil sayfası oluşturmak.
+
+Adımlar:
+1. app/models.py: `User` modeline `avatar_file` (String, default='default.jpg') sütununu ekle.
+2. app/auth/forms.py: `UpdateProfileForm` oluştur. İçinde şifre güncelleme (opsiyonel) ve `avatar` (FileField, Flask-WTF FileAllowed ile sadece 'jpg', 'png', 'jpeg' izinli) alanları olsun.
+3. app/auth/routes.py: `/profile` rotasını oluştur (Sadece giriş yapmış kullanıcılar). 
+   - Form post edildiğinde, eğer yeni bir dosya yüklendiyse `werkzeug.utils.secure_filename` ile güvenli bir isim oluştur, dosya ismine benzersiz bir hex veya uuid ekleyerek çakışmaları önle.
+   - Dosyayı `app/static/avatars/` dizinine kaydet ve veritabanında kullanıcının `avatar_file` sütununu güncelle.
+   - Şifre alanları doluysa şifreyi de hashleyerek güncelle.
+4. app/templates/auth/profile.html: Kullanıcının mevcut avatarını yuvarlak (rounded-circle) gösteren, yan tarafında da güncelleme formunu barındıran şık bir Bootstrap 5 tasarımı yap.
+5. app/templates/base.html: Navbar'daki sağ üst köşeye (kullanıcı adının yanına) ufak bir avatar resmi ve tıklandığında `/profile` rotasına giden bir link ekle.
+
+Kısıtlar:
+- Plan modunda ilerle.
+- Dizin oluşturma hatalarını önlemek için routes.py içinde `os.makedirs(avatar_path, exist_ok=True)` kontrolünü yap.
+
+
+flask db init
+flask db migrate -m "Sıfırdan temiz kurulum"
+flask db upgrade
+flask create-admin
+
+### Ajanın Önerdiği Plan
+Ajan, `User` modeline `avatar_file` sütununu eklemeyi, Flask-WTF `FileField` ile sadece resim dosyalarına izin vermeyi ve yüklenen dosyaları `werkzeug.utils.secure_filename` ile birlikte `uuid` kullanarak isimlendirip çakışmaları önlemeyi planladı. Formun gönderilmesi için HTML tarafında `enctype="multipart/form-data"` özelliğini de tasarıma dahil etti.
+
+### Plan'da Sorguladıklarım
+Dosya yükleme işlemlerinde güvenlik (sadece resim formatları) ve dosya ismi çakışmalarını önleme (uuid kullanımı) adımlarının planda yer alması son derece profesyoneldi, doğrudan onayladım.
+
+### Bu Oturumdan Öğrendiğim
+Veritabanı şemasına sonradan sütun eklerken (özellikle SQLite'ta) yaşanabilecek senkronizasyon sorunlarını ve bu durumlarda veritabanını temiz bir şekilde sıfırlamanın geliştirme sürecindeki hız kazandıran rolünü öğrendim.
+
+### Karşılaştığım Hatalar ve Çözümler
+- **Hata 1:** Yeni `avatar_file` sütunu eklendikten sonra `OperationalError: no such column: avatar_file` hatası aldım.
+- **Çözüm 1:** Veritabanına model değişikliğinin yansımadığını fark edip veritabanını sıfırlamak üzere `migrations` klasörünü sildim.
+- **Hata 2:** Migrasyon işlemlerini baştan yapmaya çalışırken `Can't locate revision identified by '9d7410296bea'` (Hayalet Migrasyon) hatası aldım.
+- **Çözüm 2:** Bu hatanın, `migrations` klasörünü silmeme rağmen `instance` klasörü altındaki fiziksel veritabanı dosyasının (`crm.db`) içinde kalan eski geçmiş kaydından (`alembic_version`) kaynaklandığını tespit ettim. Çözüm olarak `instance` içindeki `crm.db` dosyasını tamamen sildim ve terminalden sırasıyla `flask db init`, `flask db migrate`, `flask db upgrade` ve `flask create-admin` komutlarını çalıştırarak veritabanını en güncel ve temiz haliyle sıfırdan kurdum.

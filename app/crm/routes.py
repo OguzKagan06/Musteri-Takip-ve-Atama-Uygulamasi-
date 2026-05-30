@@ -1,5 +1,6 @@
-from flask import render_template, redirect, url_for, flash
+from flask import render_template, redirect, url_for, flash, request
 from flask_login import login_required, current_user
+from sqlalchemy import or_
 from app import db
 from app.crm import bp
 from app.crm.forms import CustomerForm, NoteForm
@@ -8,11 +9,22 @@ from app.models import Customer, User, Note
 @bp.route('/dashboard')
 @login_required
 def dashboard():
-    if current_user.role == 'admin':
-        customers = db.session.scalars(db.select(Customer)).all()
-    else:
-        customers = db.session.scalars(db.select(Customer).where(Customer.assigned_user_id == current_user.id)).all()
-    return render_template('crm/dashboard.html', customers=customers)
+    q = request.args.get('q')
+    query = db.select(Customer)
+    
+    if current_user.role != 'admin':
+        query = query.where(Customer.assigned_user_id == current_user.id)
+        
+    if q:
+        search_filter = or_(
+            Customer.name.ilike(f'%{q}%'),
+            Customer.surname.ilike(f'%{q}%'),
+            Customer.reference.ilike(f'%{q}%')
+        )
+        query = query.where(search_filter)
+        
+    customers = db.session.scalars(query).all()
+    return render_template('crm/dashboard.html', customers=customers, q=q)
 
 @bp.route('/customer/new', methods=['GET', 'POST'])
 @login_required

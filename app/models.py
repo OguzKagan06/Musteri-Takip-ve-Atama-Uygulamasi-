@@ -3,10 +3,11 @@ from datetime import datetime, date, timezone
 from sqlalchemy import String, Text, ForeignKey, Date, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import UserMixin
 
-from app import db 
+from app import db, login_manager 
 
-class User(db.Model):
+class User(UserMixin, db.Model):
     __tablename__ = 'users'
     
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -66,3 +67,7 @@ class Note(db.Model):
 
     def __repr__(self):
         return f'<Note {self.id} for Customer {self.customer_id} by User {self.user_id}>'
+
+@login_manager.user_loader
+def load_user(id):
+    return db.session.get(User, int(id))

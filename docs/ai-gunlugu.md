@@ -64,3 +64,7 @@ Vibe coding sürecinde ajana bağlamı (context) ve kısıtları (constraints) n
 
 ## Oturum 2 [30/05/2026]
 "Her promptta aynı şeyleri tekrar etmemek ve ajanın tipik hatalar yapmasını önlemek adına, Antigravity'nin Workspace Rules özelliğini kullanarak projenin teknik kısıtlarını (SQLAlchemy 2.x kullanımı, şifre hashleme zorunluluğu) sisteme global kural olarak tanımladım." ![Agent Rules](docs/img/Agent-Rules.png)
+
+### Karşılaştığım Hatalar ve Çözümler
+- **Hata:** Terminalde `flask db init` komutunu çalıştırdığımda `Error: No such command 'db'` hatası aldım.
+- **Çözüm:** Hatanın nedenini analiz ettiğimde, iskelet kurulumunda `app/__init__.py` dosyasının boş bırakıldığını ve Flask-Migrate eklentisinin uygulamaya tanıtılmadığını fark ettim. Ajana, `config.py` içine veritabanı URI'sini eklemesi ve `__init__.py` içinde `db.init_app(app)` ile `migrate.init_app(app, db)` yapılandırmalarını kurması için yeni bir görev (prompt) verdim. Ayrıca `.env` dosyasında `FLASK_APP=run.py` tanımlamasını yaparak Flask'a uygulamanın giriş yolunu gösterdim. Düzeltmelerden sonra migrasyon komutları sorunsuz çalıştı.

@@ -1,9 +1,10 @@
 from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 from config import Config
 
-# Extensions will be initialized here later
-# db = SQLAlchemy()
-# migrate = Migrate()
+db = SQLAlchemy()
+migrate = Migrate()
 # login_manager = LoginManager()
 
 def create_app(config_class=Config):
@@ -11,9 +12,12 @@ def create_app(config_class=Config):
     app.config.from_object(config_class)
 
     # Initialize plugins
-    # db.init_app(app)
-    # migrate.init_app(app, db)
+    db.init_app(app)
+    migrate.init_app(app, db)
     # login_manager.init_app(app)
+
+    with app.app_context():
+        from app import models
 
     # Register blueprints
     from app.main import bp as main_bp

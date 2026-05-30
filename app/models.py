@@ -1,2 +1,68 @@
-# Veritabanı modelleri buraya eklenecek
-# Örnek: User modeli, Customer modeli vs.
+from typing import List, Optional
+from datetime import datetime, date, timezone
+from sqlalchemy import String, Text, ForeignKey, Date, DateTime
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from werkzeug.security import generate_password_hash, check_password_hash
+
+from app import db 
+
+class User(db.Model):
+    __tablename__ = 'users'
+    
+    id: Mapped[int] = mapped_column(primary_key=True)
+    username: Mapped[str] = mapped_column(String(64), unique=True, index=True)
+    password_hash: Mapped[str] = mapped_column(String(256))
+    role: Mapped[str] = mapped_column(String(20), default='arayıcı')
+    
+    # İlişkiler
+    customers: Mapped[List["Customer"]] = relationship(back_populates="assigned_user", cascade="all, delete-orphan")
+    notes: Mapped[List["Note"]] = relationship(back_populates="user", cascade="all, delete-orphan")
+
+    def set_password(self, password: str):
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password: str) -> bool:
+        return check_password_hash(self.password_hash, password)
+
+    def __repr__(self):
+        return f'<User {self.username} (Role: {self.role})>'
+
+class Customer(db.Model):
+    __tablename__ = 'customers'
+    
+    id: Mapped[int] = mapped_column(primary_key=True)
+    reference: Mapped[Optional[str]] = mapped_column(String(50), index=True)
+    name: Mapped[str] = mapped_column(String(64))
+    surname: Mapped[str] = mapped_column(String(64))
+    birth_date: Mapped[Optional[date]] = mapped_column(Date)
+    district: Mapped[Optional[str]] = mapped_column(String(100))
+    profession: Mapped[Optional[str]] = mapped_column(String(100))
+    phone: Mapped[Optional[str]] = mapped_column(String(20))
+    
+    # Foreign Key
+    assigned_user_id: Mapped[Optional[int]] = mapped_column(ForeignKey('users.id'))
+    
+    # İlişkiler
+    assigned_user: Mapped[Optional["User"]] = relationship(back_populates="customers")
+    notes: Mapped[List["Note"]] = relationship(back_populates="customer", cascade="all, delete-orphan")
+
+    def __repr__(self):
+        return f'<Customer {self.name} {self.surname} (Ref: {self.reference})>'
+
+class Note(db.Model):
+    __tablename__ = 'notes'
+    
+    id: Mapped[int] = mapped_column(primary_key=True)
+    content: Mapped[str] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
+    
+    # Foreign Keys
+    customer_id: Mapped[int] = mapped_column(ForeignKey('customers.id'))
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
+    
+    # İlişkiler
+    customer: Mapped["Customer"] = relationship(back_populates="notes")
+    user: Mapped["User"] = relationship(back_populates="notes")
+
+    def __repr__(self):
+        return f'<Note {self.id} for Customer {self.customer_id} by User {self.user_id}>'

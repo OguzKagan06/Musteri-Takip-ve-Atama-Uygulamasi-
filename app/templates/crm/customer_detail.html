@@ -11,8 +11,13 @@
     <!-- Sol Taraf: Müşteri Bilgileri -->
     <div class="col-md-4 mb-4">
         <div class="card shadow-sm h-100">
-            <div class="card-header bg-primary text-white">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                 <h5 class="mb-0 py-1">{{ customer.name }} {{ customer.surname }}</h5>
+                {% if current_user.role == 'admin' %}
+                <form method="POST" action="{{ url_for('crm.delete_customer', id=customer.id) }}" onsubmit="return confirm('Bu müşteriyi tamamen silmek istediğinize emin misiniz? Müşteriye ait tüm notlar da silinecektir!');" class="m-0 p-0">
+                    <button type="submit" class="btn btn-sm btn-danger">Müşteri Sil</button>
+                </form>
+                {% endif %}
             </div>
             <div class="card-body">
                 <ul class="list-group list-group-flush">

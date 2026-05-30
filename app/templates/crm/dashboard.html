@@ -38,7 +38,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for customer in customers %}
+                {% for customer in customers.items %}
                 <tr>
                     <td>{{ customer.reference or '-' }}</td>
                     <td>{{ customer.name }} {{ customer.surname }}</td>
@@ -55,6 +55,35 @@
                 {% endfor %}
             </tbody>
         </table>
+        
+        <!-- Pagination -->
+        {% if customers.pages > 1 %}
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center mb-0">
+                <li class="page-item {% if not customers.has_prev %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('crm.dashboard', page=customers.prev_num, q=q) if customers.has_prev else '#' }}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                
+                {% for page_num in customers.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                    {% if page_num %}
+                        <li class="page-item {% if page_num == customers.page %}active{% endif %}">
+                            <a class="page-link" href="{{ url_for('crm.dashboard', page=page_num, q=q) }}">{{ page_num }}</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                    {% endif %}
+                {% endfor %}
+                
+                <li class="page-item {% if not customers.has_next %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('crm.dashboard', page=customers.next_num, q=q) if customers.has_next else '#' }}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

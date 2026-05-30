@@ -1,0 +1,64 @@
+# Pagination, Müşteri Silme ve Hata Sayfaları Planı
+
+Bu planda, uygulamanızın profesyonel hissini artırmak ve büyük veri setlerini yönetebilmek amacıyla sayfalandırma (pagination), müşteri silme yetkilendirmesi ve özel hata sayfalarının entegrasyonu yer almaktadır.
+
+## User Review Required
+
+Lütfen arama kelimelerinin (query params) sayfalandırma sırasında nasıl taşındığını ve silme işlemi esnasında kullanılacak "Cascade" (bağlı notların otomatik silinmesi) mantığını inceleyin. Onayınızın ardından geliştirmeyi başlatacağım.
+
+## Proposed Changes
+
+### 1. Sayfalandırma (Pagination) - Dashboard
+
+#### [MODIFY] app/crm/routes.py
+*   `/dashboard` rotasına `page` parametresi yakalama yeteneği eklenecek:
+    `page = request.args.get('page', 1, type=int)`
+*   `db.session.scalars(query).all()` şeklindeki sorgulama tekniği, SQLAlchemy 2.x standardı olan `db.paginate()` fonksiyonuna dönüştürülecek:
+    `pagination = db.paginate(query, page=page, per_page=5, error_out=False)`
+*   Template'e gönderilen değişken `customers=pagination` olacak.
+
+#### [MODIFY] app/templates/crm/dashboard.html
+*   Mevcut `{% for customer in customers %}` döngüsü `{% for customer in customers.items %}` olarak güncellenecek.
+*   Tablonun hemen altına Bootstrap 5 Pagination bileşeni yerleştirilecek.
+*   `customers.iter_pages()` fonksiyonu ile sayfa numaraları oluşturulurken, arama filtrelerinin (örneğin `?q=ahmet&page=2`) kaybolmaması için URL dinamik olarak oluşturulacak.
+
+---
+
+### 2. Müşteri Silme Özelliği (Admin Only)
+
+#### [MODIFY] app/crm/routes.py
+*   `@bp.route('/customer/<int:id>/delete', methods=['POST'])` adında yeni bir rota açılacak.
+*   Giriş yapan kullanıcının rolü kontrol edilecek (`if current_user.role != 'admin'`). Eğer admin değilse "Yetkisiz erişim" mesajıyla Dashboard'a gönderilecek.
+*   Müşteri silme işleminde `db.session.delete(customer)` kullanılacak. **Not:** Veritabanı modelinizde (`app/models.py`) yer alan `cascade="all, delete-orphan"` ilişkisi sayesinde, müşteri silindiğinde o müşteriye ait tüm görüşme notları da otomatik olarak silinecektir.
+
+#### [MODIFY] app/templates/crm/customer_detail.html
+*   Müşteri detay sayfasının içine (sadece adminlere görünür şekilde `{% if current_user.role == 'admin' %}`) kırmızı bir **"Müşteri Sil"** formu eklenecek.
+*   Yanlışlıkla silmeleri önlemek adına butona `onclick="return confirm('Bu müşteriyi tamamen silmek istediğinize emin misiniz? Müşteriye ait tüm notlar da silinecektir!')"` eklenecek.
+
+---
+
+### 3. Özel Hata Sayfaları (404 ve 500)
+
+#### [MODIFY] app/main/routes.py
+*   Gelişmiş kullanıcı deneyimi için iki yeni error_handler eklenecek:
+    ```python
+    @bp.app_errorhandler(404)
+    def not_found_error(error):
+        return render_template('errors/404.html'), 404
+
+    @bp.app_errorhandler(500)
+    def internal_error(error):
+        db.session.rollback()
+        return render_template('errors/500.html'), 500
+    ```
+
+#### [NEW] app/templates/errors/404.html
+*   Sayfa bulunamadığında kullanıcıyı bilgilendiren ve "Anasayfaya Dön" butonu içeren şık bir tasarım.
+
+#### [NEW] app/templates/errors/500.html
+*   Sunucu taraflı bir arıza durumunda veri tabanı kilitlenmelerini çözen (rollback) ve kullanıcıdan özür dileyerek anasayfaya yönlendiren ekran.
+
+## Verification Plan
+1. `per_page=5` olarak ayarlanıp test edilecek (Eğer sistemde 5'ten fazla müşteri varsa pagination otomatik olarak görünmeli).
+2. Admin hesabıyla müşteri detayına girilerek "Sil" butonunun varlığı ve Alert (Confirm) dialogunun çalıştığı teyit edilecek.
+3. Olmayan bir URL girilerek özel 404 sayfasının render edildiği doğrulanacak.

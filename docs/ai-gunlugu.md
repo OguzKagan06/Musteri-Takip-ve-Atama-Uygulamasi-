@@ -223,3 +223,7 @@ Ajanın veritabanı modellerimdeki gerçek sütun isimlerini (`name`, `surname`)
 
 ### Bu Oturumdan Öğrendiğim
 Arama işlemlerinde URL parametrelerinin (`GET request`) kullanım mantığını ve SQLAlchemy 2.x'te birden fazla filtre koşulunu zincirleme (`query.where().where()`) şeklinde nasıl güvenle ekleyebileceğimi kavradım. Ayrıca AI'ın sadece söyleneni yapan değil, kodun mevcut bağlamını anlayıp hatalı promptları düzeltebilen bir asistan olduğunu gördüm.
+
+### Ekstra Güvenlik İyileştirmesi (Hotfix)
+- **Sorun:** Sistemi test ederken, normal yetkilere sahip "arayıcı" kullanıcıların da kendi kendilerine müşteri ekleyebildiğini ve veri tutarlılığını bozabileceğini (business logic flaw) fark ettim.
+- **Çözüm:** Ajanı yönlendirerek `customer/new` rotasına sıkı bir RBAC kontrolü (`if current_user.role != 'admin'`) eklettim. Yetkisiz girişleri engellemekle kalmayıp, arayüzdeki (UI) "Yeni Müşteri Ekle" butonunu da Jinja koşulu ile normal kullanıcılardan gizleyerek sistemin güvenliğini tam kurumsal bir yapıya kavuşturdum.

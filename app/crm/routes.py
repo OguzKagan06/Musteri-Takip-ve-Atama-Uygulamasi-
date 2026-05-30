@@ -10,7 +10,8 @@ from app.models import Customer, User, Note
 @login_required
 def dashboard():
     q = request.args.get('q')
-    query = db.select(Customer)
+    page = request.args.get('page', 1, type=int)
+    query = db.select(Customer).order_by(Customer.id.desc())
     
     if current_user.role != 'admin':
         query = query.where(Customer.assigned_user_id == current_user.id)
@@ -23,7 +24,7 @@ def dashboard():
         )
         query = query.where(search_filter)
         
-    customers = db.session.scalars(query).all()
+    customers = db.paginate(query, page=page, per_page=5, error_out=False)
     return render_template('crm/dashboard.html', customers=customers, q=q)
 
 @bp.route('/customer/new', methods=['GET', 'POST'])
@@ -84,3 +85,20 @@ def customer_detail(id):
         
     notes = db.session.scalars(db.select(Note).where(Note.customer_id == customer.id).order_by(Note.created_at.desc())).all()
     return render_template('crm/customer_detail.html', customer=customer, form=form, notes=notes)
+
+@bp.route('/customer/<int:id>/delete', methods=['POST'])
+@login_required
+def delete_customer(id):
+    if current_user.role != 'admin':
+        flash('Bu işlemi yapma yetkiniz yok.', 'danger')
+        return redirect(url_for('crm.dashboard'))
+        
+    customer = db.session.get(Customer, id)
+    if customer is None:
+        flash('Müşteri bulunamadı.', 'danger')
+        return redirect(url_for('crm.dashboard'))
+        
+    db.session.delete(customer)
+    db.session.commit()
+    flash('Müşteri ve ilgili notlar başarıyla silindi.', 'success')
+    return redirect(url_for('crm.dashboard'))

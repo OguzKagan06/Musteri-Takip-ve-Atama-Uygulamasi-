@@ -1,0 +1,28 @@
+# Son Dokunuşlar: Sayfalandırma, Silme İşlemleri ve Hata Yönetimi
+
+Projeyi mükemmelleştirmek adına Dashboard'a sayfalandırma (pagination) entegre edildi, adminlere müşteri silme ayrıcalığı tanındı ve olası teknik hatalar için özel, şık hata sayfaları (404/500) oluşturuldu.
+
+## Yapılan Değişiklikler
+
+*   **1. Sayfalandırma (Pagination) - `app/crm/routes.py` & `dashboard.html`**
+    *   Dashboard'da bulunan `db.session.scalars().all()` sorgusu, SQLAlchemy 2.x standardı olan `db.paginate(..., per_page=5)` formatına dönüştürüldü.
+    *   Test etmenizi kolaylaştırmak için her sayfada en fazla 5 müşteri görünecek şekilde kısıtlandı.
+    *   Sayfa altındaki numaralandırma butonlarına (1, 2, 3...) tıkladığınızda eğer o an aktif olan bir arama filtreniz (`?q=ahmet`) varsa, o filtrenin kaybolmaması için URL dinamik hale getirildi (`url_for(..., page=page_num, q=q)`).
+
+*   **2. Müşteri Silme (Yetki Korumalı) - `app/crm/routes.py` & `customer_detail.html`**
+    *   Müşteri detay ekranına sadece admin rolünün görebileceği kırmızı renkli bir "Müşteri Sil" butonu eklendi.
+    *   Kullanıcı deneyimini korumak için, butona tıklandığında "Emin misiniz?" şeklinde bir JavaScript uyarı/onay kutusu (alert dialog) açılması sağlandı.
+    *   Arka planda ise yetki güvenliği kontrolünden geçildikten sonra müşteri veritabanından silindi (`db.session.delete`). Modelinizde yer alan **cascade** kuralı sayesinde, o müşteriye ait geçmiş notların (hayalet veri kalmaması için) otomatik olarak silinmesi başarıyla gerçekleşmektedir.
+
+*   **3. Özel Hata Sayfaları (404 / 500) - `app/main/routes.py` & `app/templates/errors/`**
+    *   Kullanıcıların yanlış URL girmesi (404) veya sunucuda bir kod çökmesi yaşanması (500) durumunda, standart ve çirkin tarayıcı hataları yerine özel tasarımlı Bootstrap 5 sayfaları oluşturuldu.
+    *   Her iki hatanın ortasında da kullanıcıyı güvenle Dashboard'a döndürecek bir "Anasayfaya Dön" butonu yerleştirildi.
+    *   Özellikle 500 hatalarında, kilitlenen veritabanı işlemlerini sıfırlayıp sistemi normale döndürmek için `db.session.rollback()` mekanizması devreye alındı.
+
+## Test ve Doğrulama
+Kodların `python -m py_compile` ile sözdizimi doğrulamaları yapılmış olup tamamen hatasızdır. Veritabanı yapısında bir değişiklik olmadığı için **migrasyon çalıştırmanıza gerek yoktur**. 
+
+Uygulamanızı başlatarak (`flask run`);
+1. Sahte 6-7 adet müşteri ekleyip sayfa altındaki 1-2 butonlarını deneyebilirsiniz.
+2. Adres çubuğuna uygulamanızda olmayan `http://127.0.0.1:5000/olmayansayfa` yazarak 404 ekranını görebilirsiniz.
+3. Yönetici hesabınızla bir müşteriyi silip tablodan uçtuğunu teyit edebilirsiniz.

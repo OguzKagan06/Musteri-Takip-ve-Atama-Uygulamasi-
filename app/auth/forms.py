@@ -23,6 +23,6 @@ class LoginForm(FlaskForm):
 
 class UpdateProfileForm(FlaskForm):
     avatar = FileField('Profil Fotoğrafı', validators=[FileAllowed(['jpg', 'png', 'jpeg'], 'Sadece resim dosyaları yüklenebilir!')])
-    password = PasswordField('Yeni Şifre (Değiştirmek istemiyorsanız boş bırakın)', validators=[Optional(), Length(min=6)])
-    confirm_password = PasswordField('Yeni Şifreyi Onayla', validators=[EqualTo('password')])
+    new_password = PasswordField('Yeni Şifre (Değiştirmek istemiyorsanız boş bırakın)', validators=[Optional(), Length(min=6)])
+    confirm_password = PasswordField('Yeni Şifreyi Onayla', validators=[EqualTo('new_password')])
     submit = SubmitField('Güncelle')

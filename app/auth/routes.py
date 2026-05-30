@@ -60,8 +60,8 @@ def profile():
             avatar_file.save(os.path.join(avatar_path, unique_filename))
             current_user.avatar_file = unique_filename
             
-        if form.password.data:
-            current_user.set_password(form.password.data)
+        if form.new_password.data:
+            current_user.set_password(form.new_password.data)
             
         db.session.commit()
         flash('Profiliniz başarıyla güncellendi.', 'success')

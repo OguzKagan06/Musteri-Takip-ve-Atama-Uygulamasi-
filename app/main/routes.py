@@ -31,13 +31,24 @@ def send_notification():
     
     form = SendNotificationForm()
     users = db.session.scalars(db.select(User).where(User.id != current_user.id)).all()
-    form.user_id.choices = [(user.id, f"{user.username} ({user.role})") for user in users]
+    
+    choices = [('all', 'Tüm Arayıcılar (Toplu Duyuru)')]
+    choices.extend([(str(user.id), f"{user.username} ({user.role})") for user in users])
+    form.user_id.choices = choices
     
     if form.validate_on_submit():
-        notification = Notification(user_id=form.user_id.data, message=form.message.data)
-        db.session.add(notification)
-        db.session.commit()
-        flash('Bildirim başarıyla gönderildi.', 'success')
+        if form.user_id.data == 'all':
+            for user in users:
+                notification = Notification(user_id=user.id, message=form.message.data)
+                db.session.add(notification)
+            db.session.commit()
+            flash('Toplu duyuru başarıyla gönderildi.', 'success')
+        else:
+            notification = Notification(user_id=int(form.user_id.data), message=form.message.data)
+            db.session.add(notification)
+            db.session.commit()
+            flash('Kişisel bildirim başarıyla gönderildi.', 'success')
+            
         return redirect(url_for('main.send_notification'))
         
     return render_template('main/send_notification.html', form=form)

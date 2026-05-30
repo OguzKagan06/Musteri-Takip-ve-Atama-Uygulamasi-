@@ -17,10 +17,15 @@ def inject_notifications():
 @login_required
 def read_notification(id):
     notification = db.session.get(Notification, id)
-    if notification and notification.user_id == current_user.id:
+    if not notification or notification.user_id != current_user.id:
+        flash('Bildirim bulunamadı veya erişim yetkiniz yok.', 'danger')
+        return redirect(url_for('main.index'))
+        
+    if not notification.is_read:
         notification.is_read = True
         db.session.commit()
-    return redirect(request.referrer or url_for('main.index'))
+        
+    return render_template('main/notification_detail.html', notification=notification)
 
 @bp.route('/admin/send-notification', methods=['GET', 'POST'])
 @login_required

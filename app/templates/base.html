@@ -255,7 +255,7 @@
                         {% if latest_notifications %}
                             {% for notif in latest_notifications %}
                             <a href="{{ url_for('main.read_notification', id=notif.id) }}" class="p-4 hover:bg-primary/10 transition-colors block {% if not notif.is_read %}bg-primary/5 border-l-2 border-primary{% endif %}">
-                                <p class="font-body-md text-sm {% if not notif.is_read %}text-on-surface font-semibold{% else %}text-on-surface-variant{% endif %}">
+                                <p class="font-body-md text-sm line-clamp-2 whitespace-normal break-words {% if not notif.is_read %}text-on-surface font-semibold{% else %}text-on-surface-variant{% endif %}">
                                     {{ notif.message }}
                                 </p>
                                 <small class="text-xs text-on-surface-variant/50 mt-1 block">{{ notif.timestamp.strftime('%d.%m.%Y %H:%M') }}</small>

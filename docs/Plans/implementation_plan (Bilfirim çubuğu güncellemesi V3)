@@ -1,0 +1,37 @@
+# Bildirim Detay Sayfası ve Tasarım İyileştirmesi Planı
+
+Uzun bildirim metinlerinin sağ üstteki açılır (dropdown) menü tasarımını bozmasını engellemek için metinleri CSS ile kırpacağız ve bildirime tıklandığında tam metnin rahatça okunabileceği yeni bir detay sayfasına yönlendirme yapacağız.
+
+## User Review Required
+
+Aşağıdaki şablon güncellemelerini ve rota yönlendirmesindeki değişiklik planını lütfen inceleyip onaylayın.
+
+## Proposed Changes
+
+### app/templates/base.html
+Bildirim dropdown menüsündeki metin görünümünü sınırlandıracağız.
+
+#### [MODIFY] app/templates/base.html
+*   Dropdown içindeki bildirimleri listeleyen `p` (paragraf) etiketine `line-clamp-2`, `whitespace-normal` ve `break-words` Tailwind sınıfları eklenecek. Bu sayede 2 satırdan uzun metinler "..." şeklinde kesilecek ve arayüzün taşması engellenecek.
+
+### app/main/routes.py
+Okunma işlemi sonrasındaki yönlendirme (redirect) mantığını değiştireceğiz.
+
+#### [MODIFY] app/main/routes.py
+*   `/notifications/read/<int:id>` rotası:
+    *   Bildirimi `is_read = True` yapıp veritabanına kaydettikten sonra `redirect(request.referrer)` yapmak YERİNE,
+    *   Yeni oluşturacağımız `render_template('main/notification_detail.html', notification=notification)` koduyla tam sayfa detay arayüzünü render edecek.
+
+### app/templates/main/notification_detail.html
+Karanlık temamıza uygun, okunabilirliği yüksek yeni bir ekran tasarlayacağız.
+
+#### [NEW] app/templates/main/notification_detail.html
+*   **Glassmorphism Bildirim Kartı:**
+    *   Bildirim metni geniş ve okunaklı (`text-body-md` veya `text-headline-lg-mobile`) bir biçimde sunulacak.
+    *   Bildirimin gönderilme zamanı (timestamp) şık ve transparan bir formatta sayfanın sağ/alt köşesinde belirtilecek.
+    *   Alt kısımda `ruby-btn` sınıfını kullanan bir "Dashboard'a Dön" (`crm.dashboard` veya `main.index`) yönlendirme butonu bulunacak.
+
+## Verification Plan
+1. Admin hesabıyla girilerek kasıtlı olarak çok uzun bir metne sahip test bildirimi gönderilecek.
+2. Sağ üstteki zile tıklandığında açılan menüde uzun metnin sadece 2 satır göründüğü ve sonunun "..." ile kesildiği (tasarımın taşmadığı) kontrol edilecek.
+3. Bu uzun bildirime tıklandığında okunma durumunun (rozetin) değiştiği ve yeni tasarladığımız detay sayfasının bildirim tam metnini göstererek hatasız açıldığı test edilecek.

@@ -343,3 +343,7 @@ Backend tarafında, her sayfaya (`render_template`) ayrı ayrı veri göndermek 
 
 ### Karşılaştığım Hatalar ve Test Süreci
 - **Test ve Doğrulama:** Yeni veritabanı tablosu eklendiği için önce terminalden `flask db migrate` ve `upgrade` komutlarını çalıştırarak modeli işledim. Ardından sistemin tepkisini ölçmek için `flask shell` komut dosyasını açıp SQLAlchemy komutlarıyla (`db.session.add()`) veritabanına doğrudan sahte (mock) bir bildirim ekledim. UI tarafında kırmızı rozetin (badge) ve okundu/okunmadı mantığının kusursuz çalıştığını doğruladım.
+
+### Ekstra Geliştirme: Toplu Bildirim (Broadcast) Altyapısı
+- **Fikir:** Adminin sadece tekil kullanıcılara değil, tüm ekibe aynı anda sistem içi duyuru yapabilmesi gerektiğini düşündüm.
+- **Uygulama:** Ajanı yönlendirerek bildirim formundaki seçiciye (SelectField) 'Tüm Arayıcılar' parametresini (`'all'`) eklettim. Backend rotasında bu parametre yakalandığında, SQLAlchemy ile admin hariç tüm kullanıcıları çeken ve bir `for` döngüsü içinde herkese aynı anda bildirim (Notification) objesi üreten dinamik bir broadcast mekanizması kurdum. Bu sayede çağrı merkezindeki tüm ekibe anlık duyuru geçilebilmesinin önü açıldı.

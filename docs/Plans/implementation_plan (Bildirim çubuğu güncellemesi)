@@ -1,0 +1,48 @@
+# Bildirim Sistemi (Notification System) Entegrasyon Planı
+
+Tasarımımıza uygun bir şekilde, veritabanı destekli, okunmamış bildirimleri global olarak gösteren dinamik bir bildirim sistemi inşa edeceğiz.
+
+## User Review Required
+
+Aşağıdaki veritabanı değişikliklerini, global verilerin yüklenme şeklini ve frontend şablon entegrasyonlarını lütfen inceleyip onaylayın. Onayınızdan sonra `flask db migrate` işlemi için size bir uyarı yapacağım.
+
+## Proposed Changes
+
+### app/models.py
+Kullanıcılara bildirim göndermek ve okundu durumunu tutmak için yeni bir veritabanı modeli (tablosu) ekleyeceğiz.
+
+#### [MODIFY] app/models.py
+*   **Notification Modeli (Yeni):**
+    *   `id` (Primary Key)
+    *   `user_id` (ForeignKey -> users.id)
+    *   `message` (String, bildirim metni)
+    *   `is_read` (Boolean, varsayılan: False)
+    *   `timestamp` (DateTime, varsayılan: utcnow)
+*   **User Modeli İlişkisi:**
+    *   `User` sınıfının içine `notifications = relationship(...)` eklenerek `cascade='all, delete-orphan'` kuralı verilecek. Böylece kullanıcı silinirse bildirimleri de silinecek.
+
+### app/main/routes.py
+Uygulama genelinde (tüm şablonlarda) okunmamış bildirim sayısına ve en son 5 bildirime ulaşabilmek için Flask'ın *Context Processor* özelliğini kullanacağız.
+
+#### [MODIFY] app/main/routes.py
+*   **app_context_processor Eklemesi:**
+    *   `@bp.app_context_processor` dekoratörü ile `inject_notifications()` adında bir fonksiyon oluşturacağız.
+    *   Eğer kullanıcı giriş yapmışsa; `unread_notifications_count` ve `latest_notifications` (son 5) verilerini SQLAlchemy 2.x stili ile hesaplayıp döndürecek.
+*   **Bildirim Okuma Rotası (Yeni):**
+    *   `/notifications/read/<int:id>` rotası eklenecek.
+    *   Tıklandığında bildirimin sahibinin giriş yapan kullanıcıyla aynı olup olmadığı teyit edilip, `is_read = True` yapılacak ve kullanıcı aynı sayfaya (`request.referrer`) yönlendirilecek.
+
+### app/templates/base.html
+Üst barda yer alan statik zil ikonunu canlandıracağız. Dropdown (açılır menü) etkileşimi için çok hafif olan **Alpine.js** kütüphanesini `<head>` içine ekleyeceğim.
+
+#### [MODIFY] app/templates/base.html
+*   `<head>` etiketine Alpine.js eklenecek.
+*   **Header / Zile Tıklama:**
+    *   Zil butonunun sağ üst köşesindeki kırmızı nokta (badge) sadece `unread_notifications_count > 0` olduğunda gösterilecek.
+    *   Zile tıklandığında Alpine.js yardımıyla (`x-show="open"`) şık bir "Dark Glassmorphism" açılır menü (Dropdown) belirecek.
+    *   İçerisinde `latest_notifications` listelenecek. Okunmamış olanlar kırmızı transparan arka plana (`bg-primary/5`) ve daha kalın bir fonta sahip olacak. Bildirim yoksa "Yeni bildiriminiz yok" yazacak.
+
+## Verification Plan
+1. `flask db migrate` ve `flask db upgrade` adımlarıyla `Notification` tablosunun oluştuğu kontrol edilecek.
+2. Terminal (Flask Shell) üzerinden veya uygulamada tetiklenecek sahte (mock) bir bildirim eklenerek UI testi yapılacak.
+3. Dropdown tıklandığında okunmamış bildirimin kalın fontla belirdiği ve tıklandığında `is_read=True` olup rozetin kaybolduğu teyit edilecek.

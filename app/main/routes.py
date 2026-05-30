@@ -1,7 +1,25 @@
-from flask import render_template, redirect, url_for
-from flask_login import current_user
+from flask import render_template, redirect, url_for, request
+from flask_login import current_user, login_required
 from app.main import bp
 from app import db
+from app.models import Notification
+
+@bp.app_context_processor
+def inject_notifications():
+    if current_user.is_authenticated:
+        unread_count = db.session.scalar(db.select(db.func.count(Notification.id)).where(Notification.user_id == current_user.id, Notification.is_read == False))
+        latest = db.session.scalars(db.select(Notification).where(Notification.user_id == current_user.id).order_by(Notification.timestamp.desc()).limit(5)).all()
+        return dict(unread_notifications_count=unread_count, latest_notifications=latest)
+    return dict(unread_notifications_count=0, latest_notifications=[])
+
+@bp.route('/notifications/read/<int:id>')
+@login_required
+def read_notification(id):
+    notification = db.session.get(Notification, id)
+    if notification and notification.user_id == current_user.id:
+        notification.is_read = True
+        db.session.commit()
+    return redirect(request.referrer or url_for('main.index'))
 
 @bp.route('/')
 def index():

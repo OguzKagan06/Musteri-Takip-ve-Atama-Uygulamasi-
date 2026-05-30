@@ -1,6 +1,6 @@
 from typing import List, Optional
 from datetime import datetime, date, timezone
-from sqlalchemy import String, Text, ForeignKey, Date, DateTime
+from sqlalchemy import String, Text, ForeignKey, Date, DateTime, Boolean
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
@@ -19,6 +19,7 @@ class User(UserMixin, db.Model):
     # İlişkiler
     customers: Mapped[List["Customer"]] = relationship(back_populates="assigned_user", cascade="all, delete-orphan")
     notes: Mapped[List["Note"]] = relationship(back_populates="user", cascade="all, delete-orphan")
+    notifications: Mapped[List["Notification"]] = relationship(back_populates="user", cascade="all, delete-orphan")
 
     def set_password(self, password: str):
         self.password_hash = generate_password_hash(password)
@@ -72,3 +73,17 @@ class Note(db.Model):
 @login_manager.user_loader
 def load_user(id):
     return db.session.get(User, int(id))
+
+class Notification(db.Model):
+    __tablename__ = 'notifications'
+    
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
+    message: Mapped[str] = mapped_column(String(255))
+    is_read: Mapped[bool] = mapped_column(Boolean, default=False)
+    timestamp: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
+    
+    user: Mapped["User"] = relationship(back_populates="notifications")
+
+    def __repr__(self):
+        return f'<Notification {self.id} for User {self.user_id}>'

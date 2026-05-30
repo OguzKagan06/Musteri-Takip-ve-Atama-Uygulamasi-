@@ -11,6 +11,7 @@ from app.models import Customer, User, Note
 def dashboard():
     q = request.args.get('q')
     page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 5, type=int)
     query = db.select(Customer).order_by(Customer.id.desc())
     
     if current_user.role != 'admin':
@@ -24,7 +25,7 @@ def dashboard():
         )
         query = query.where(search_filter)
         
-    customers = db.paginate(query, page=page, per_page=5, error_out=False)
+    customers = db.paginate(query, page=page, per_page=per_page, error_out=False)
     return render_template('crm/dashboard.html', customers=customers, q=q)
 
 @bp.route('/customer/new', methods=['GET', 'POST'])

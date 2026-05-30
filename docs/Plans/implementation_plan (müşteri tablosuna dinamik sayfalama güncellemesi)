@@ -1,0 +1,37 @@
+# Dinamik Sayfalama ve Kayıt Sayısı Gösterimi Planı
+
+Dashboard üzerindeki müşteri tablosunu daha profesyonel hale getirmek için toplam filtreli kayıt sayısını ekranda gösterecek ve kullanıcıya sayfada kaç veri görmek istediğini seçme (5, 10, 20, 50) imkanı tanıyacağız.
+
+## User Review Required
+
+Aşağıdaki backend (route) ve frontend (şablon) güncellemelerini lütfen inceleyip onaylayın.
+
+## Proposed Changes
+
+### app/crm/routes.py
+Sayfa başına gösterilecek öge sayısını URL üzerinden dinamik olarak alacağız.
+
+#### [MODIFY] app/crm/routes.py
+*   `/dashboard` rotasında, mevcut sayfa numarasını (`page`) aldığımız gibi, URL'den `per_page` parametresi de alınacak.
+    *   `per_page = request.args.get('per_page', 5, type=int)` (Eğer girilmediyse varsayılan olarak 5 kullanılacak).
+*   Mevcut `db.paginate` fonksiyonu `per_page=5` yerine dinamik olarak `per_page=per_page` değişkeni ile çalıştırılacak.
+*   Bu sayede şablona gönderilen `customers` objesi (Pagination nesnesi) kullanıcının seçimine göre 10'luk veya 50'lik paketler üretecek.
+
+### app/templates/crm/dashboard.html
+Kullanıcıya veri hacmini ve sayfalama seçeneklerini kibar bir biçimde sunacağız.
+
+#### [MODIFY] app/templates/crm/dashboard.html
+*   **Toplam Kayıt Görüntüleyicisi:**
+    *   Arama çubuğunun hemen altına veya tablonun sol üst hizasına `text-sm text-on-surface-variant` sınıflarına sahip bir etiket ile `Toplam {{ customers.total }} Kayıt Bulundu` ibaresi yazdırılacak.
+*   **Sayfa Başına Kayıt Seçici:**
+    *   Tablonun hemen altındaki sayfa numaratörünün (pagination block) sağ/sol tarafına veya hemen üstüne yeni bir bölüm açılacak.
+    *   Bu alana "Kayıt Göster:" yazısının yanına `[5] [10] [20] [50]` rakamları, tıklanabilir hafif buton/rozet (örn. `text-on-surface-variant hover:text-primary`) olarak eklenecek.
+    *   Bu linklerin hedefi (`href`), mevcut arama kelimesini (`q`) bozmadan sadece `per_page` parametresini değiştirecek şekilde ayarlanacak. (Örn: `url_for('crm.dashboard', q=q, per_page=20, page=1)`)
+*   **Mevcut Sayfalama Linklerinin Güncellenmesi:**
+    *   Aşağıdaki sayfa 1, 2, 3.. ve İleri/Geri butonlarındaki (href) mevcut linklere `per_page=customers.per_page` argümanı da eklenecek ki kullanıcı sonraki sayfaya geçerken seçtiği (Örn: 50'lik) görünüm kaybolmasın.
+
+## Verification Plan
+1. Sayfa yenilendiğinde sol üstte/arama çubuğu çevresinde (örn: "Toplam 12 Kayıt Bulundu") metninin hatasız belirdiği görülecek.
+2. Tablo altındaki "20" veya "50" rozetine tıklandığında sayfanın yenilendiği ve gerçekten tek seferde 20 satır listelediği teyit edilecek.
+3. 20'lik listedeyken alttan "Sonraki Sayfa (İleri)" tuşuna basıldığında hala 20'şer 20'şer listeleme huyunu koruduğu denenecek.
+4. Arama çubuğunda "Ahmet" aranıp toplam kayıt sayısının otomatik olarak sadece Ahmet'lerin sayısını yansıttığı test edilecek.

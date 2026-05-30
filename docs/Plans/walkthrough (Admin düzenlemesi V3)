@@ -1,0 +1,74 @@
+# Cyber Gate Redux: Tasarım Sistemi Tamamlandı
+
+Vibe Coding prensibiyle ilerlediğimiz tasarım entegrasyon sürecinin son (2.) etabını da başarıyla tamamladık. Projedeki tüm kalıntı Bootstrap 5 yapıları temizlendi ve "Dark Tech Minimalism" anlayışıyla kodlanmış Glassmorphism yapılarına dönüştürüldü.
+
+## 1. Etap Özeti (Hub & Base)
+*   **Base:** Özel arka plan kırmızı "Ambient Glow" efekti, dinamik `SideNavBar` ve `TopAppBar` eklendi.
+*   **Hub (Ana Portal):** Grid kartları ve zıplama (hover) efektleriyle "Çok Yakında" modülleri oluşturuldu.
+
+## 2. Etap Özeti (Formlar, CRM & Hatalar)
+
+*   **Auth Formları (`login.html`, `register.html`, `profile.html`)**
+    *   Formlar, merkezlenmiş `.glass-card` yapılarıyla sarmalandı.
+    *   Input alanlarına "Dark charcoal fill" konsepti uygulandı (`bg-surface-container-high border-white/10`). Tıklandığında kırmızıya (`focus:ring-primary`) dönen neon efektler eklendi.
+    *   Profil sayfasında kullanıcının avatarının etrafına özel bir kırmızı gölge (shadow) verildi ve dosya seçme input'u (file picker) Tailwind pseudo-class'ları (`file:mr-4 file:rounded-md`) ile şıklaştırıldı.
+
+*   **CRM Dashboard (`dashboard.html`)**
+    *   Müşteri listesindeki klasik Bootstrap tablosu iptal edilip, karanlık temaya ve mobil uyumlu `overflow-x-auto` yapısına dönüştürüldü.
+    *   Tablo satırlarında üzerine gelindiğinde (hover) arka planda hafif bir kırmızı parlamaya (`hover:bg-primary/5`) sahip "hover state" oluşturuldu.
+    *   Pagination (Sayfalandırma) alanı, Bootstrap sınıflarından temizlenip saydam kenarlıklı, aktif sayfanın kırmızı arka planla (`bg-primary/20`) öne çıktığı teknolojik bir buton kümesine dönüştürüldü.
+
+*   **CRM Detay Sayfaları (`add_customer.html`, `customer_detail.html`)**
+    *   Müşteri ekleme formunda "Grid (Izgara)" sistemi kullanılarak içerik sol ve sağ kolonlara dengeli dağıtıldı.
+    *   Müşteri detay ekranında "Görüşme Geçmişi" notları, sol kenarında kırmızı neon şerit taşıyan (`border-l-4 border-l-primary/50`) özel glass-card modüllerine dönüştürüldü. "Sil" butonu tehlike arz ettiği için kırmızı tonla (`bg-red-500/20 text-red-400`) belirginleştirildi.
+
+*   **Hata Sayfaları (`404.html`, `500.html`)**
+    *   Sıradan metinler yerine büyük Material Symbols ikonları, `font-display-lg` ile oluşturulmuş devasa hata kodları ve kırmızı transparan çerçeveli (`border-dashed border-primary/30`) ekranlar oluşturuldu.
+
+## 3. Hata Giderimleri (Bug Fixes)
+*   **Profil Şifre Güncelleme Hatası:** Şablondaki `new_password` alanı ile arka plandaki `password` değişkeninin uyuşmazlığından kaynaklanan `UndefinedError` giderildi.
+    *   `app/auth/forms.py` içerisindeki şifre alanları `new_password` olarak revize edildi.
+    *   `app/auth/routes.py` rotası şifre değişiminde yeni değişkeni `current_user.set_password(form.new_password.data)` şeklinde yakalayıp, veritabanına yine güvenli bir şekilde `werkzeug.security` (generate_password_hash) kullanarak şifrelemeye devam edecek şekilde onarıldı.
+*   **Kullanıcı Kayıt (Rol) Hatası:** `register.html` sayfasındaki `role` alanının eksikliğinden kaynaklanan `UndefinedError` giderildi.
+    *   `app/auth/forms.py` dosyasına `SelectField` import edilerek, "arayıcı" ve "admin" seçeneklerini barındıran `role` alanı eklendi.
+    *   `app/auth/routes.py` içinde yeni kayıt esnasında seçilen rolün de `User(..., role=form.role.data)` ile veritabanına kaydedilmesi sağlandı.
+
+## 4. Yeni Özellik: Bildirim Sistemi (Notification System)
+Projeye, veritabanı destekli dinamik bir bildirim sistemi eklendi:
+*   **Veritabanı (Backend):** `app/models.py` içerisine `Notification` sınıfı eklendi. Kullanıcılarla (`User`) ilişkilendirilerek bildirim mesajı, okundu/okunmadı durumu (`is_read`) ve zaman damgası (`timestamp`) özellikleri tanımlandı.
+*   **Global Veri Dağıtımı:** `app/main/routes.py` içine Flask'ın `@bp.app_context_processor` dekoratörü kurularak, sistemin her sayfasında okunmamış bildirim sayısına (`unread_notifications_count`) ve en güncel 5 bildirime (`latest_notifications`) erişim imkanı sağlandı.
+*   **Arayüz (Frontend) & Alpine.js:** `base.html` üzerindeki zil ikonu Alpine.js kullanılarak etkileşimli bir "Açılır Menü (Dropdown)" haline getirildi. Bildirim sayısı kırmızı bir rozet ile belirtildi. Listelenen bildirimlere tıklandığında `/notifications/read/<id>` rotası üzerinden bildirim okundu olarak işaretlenip arka planda kaydediliyor.
+*   **Admin Bildirim Gönderme Paneli & Toplu Duyuru:** `app/main/forms.py` dosyasına eklenen yeni bir form ile `app/templates/main/send_notification.html` sayfasında şık bir (Glassmorphism) arayüz oluşturuldu. Adminler sol menüdeki "Bildirim Gönder" butonuyla ulaştıkları bu ekrandan, sistemdeki istedikleri bir kullanıcıya anlık bildirim atabilme yeteneği kazandılar. Eklenen "Toplu Duyuru (Broadcast)" özelliği sayesinde form üzerinden `Tüm Arayıcılar` seçeneği tercih edilerek sistemdeki herkese tek tuşla aynı duyuru iletilebilmektedir.
+*   **Bildirim Detay Sayfası ve UI Optimizasyonu:** Sağ üstteki bildirim açılır menüsünün (dropdown) uzun metinler sebebiyle taşmasını önlemek için metinler CSS (`line-clamp-2`, `break-words`) ile 2 satıra sınırlandırıldı. Kullanıcı bu bildirime tıkladığında sadece okundu olarak işaretlenmekle kalmıyor, artık bildirimin tam metnini ve tarihini geniş, okunaklı ve şık bir cam görünümlü detay sayfasında (`notification_detail.html`) görüntüleyebiliyor.
+
+## 5. Yeni Özellik: Müşteri Görüşme Durumu ve Takibi
+Operasyonel takibi kolaylaştırmak adına müşterilerin aranma durumlarını sisteme entegre ettik:
+*   **Veritabanı (Backend):** `Customer` modeline varsayılan değeri "Yeni Kayıt" olan `call_status` sütunu ve işlemi yapan kişiyi kaydetmek için `last_called_by_id` sütunu eklendi.
+*   **Otomatik Takip (Routing):** Müşteri ekleme ve düzenleme işlemlerinde form üzerinden sadece "Görüşme Durumu" alınıyor. "Son işlemi kim yaptı" bilgisi güvenlik amacıyla kullanıcının aktif oturumu üzerinden (`current_user.id`) otomatik olarak kaydediliyor.
+*   **Görüşme Durumu Arayüz Entegrasyonu:** Müşteri Ekleme ve Müşteri Düzenleme formlarına (ortak şablon olan `add_customer.html` üzerine), Dark Tech temasıyla uyumlu ve hata yakalayıcı (validation) Jinja döngülerini içeren "Görüşme Durumu" açılır listesi (`call_status` SelectField) başarıyla eklendi. Ayrıca Müşteri Detay sayfasına (`customer_detail.html`) hem yetkili kullanıcıların hem de adminlerin müşteriyi (durum, telefon vb.) sonradan güncelleyebilmesi için bir "Düzenle" butonu entegre edildi.
+*   **Dinamik Sayfalama ve Veri Gösterimi:** Müşteri listesi Dashboard sayfasında geliştirildi. Arama çubuğunun hemen sağında, veritabanından dönen toplam müşteri sayısını (`customers.total`) gösteren şık bir etiket eklendi. Ayrıca tablonun hemen altına, kullanıcıların sayfa başına göstermek istediği kayıt sayısını (5, 10, 20, 50) dinamik olarak seçebileceği tıklanabilir rozetler yerleştirildi. Bu sistem arama filtreleriyle (q parametresi) tam uyumlu şekilde çalışmaktadır.
+*   **Ana Portal (Hub) İyileştirmesi:** Ana ekranda (`index.html`) bulunan ve sahte statik veriler içeren "Sistem Yükü" kartı tamamen kaldırıldı. Geriye kalan "Aktif Kullanıcı" başlığı "Aktif Müşteri" olarak değiştirildi ve bu karta yazılan statik rakam (1,204), arka planda `Customer` veritabanı üzerinden (`db.session.scalar(db.select(db.func.count(Customer.id)))`) canlı çekilerek, tamamen dinamik hale getirildi. Artık sisteme her yeni müşteri eklendiğinde Hub ekranındaki bu sayı otomatik güncellenecek. Kartın devasa şekilde uzayıp ekranı kaplamaması için de genişliği (`max-w-sm`) sınırlandırılarak derli toplu bir tasarım elde edildi.
+*   **Güvenli Kullanıcı Yönetimi ve Rol Hiyerarşisi:** Sistemdeki kullanıcı rolleri 3 seviyeli bir hiyerarşiye oturtuldu: `super_admin` (Kurucu), `admin` (Yönetici) ve `arayıcı`. "Kullanıcı Yönetimi" tablosunda yetkiler görsel olarak ayrıştırıldı ve tablo doğrudan rol seviyesine göre sıralandı (Kurucu her zaman en üstte).
+*   **Yetki Bazlı Şifre Doğrulamalı Silme:** Silme butonlarına sıkı bir yetki (Authorization) mantığı eklendi:
+    *   **Kurucu (`super_admin`)** asla silinemez (Butonu gizlidir).
+    *   **Yöneticiler (`admin`)** yalnızca normal kullanıcıları (`arayıcı`) silebilir; diğer yöneticileri silmeye kalkarlarsa buton "Yetkisiz" olarak gözükür ve sunucu tarafında da işlem engellenir.
+    *   **Sistem Kurucusu**, tüm kullanıcıları (diğer yöneticiler dahil) yönetip silebilir.
+    *   **Kendi Hesabını Silme:** Bir yetkili (kurucu hariç) güvenli olarak kendi hesabını sildiğinde, geride açık oturum kalmaması için sistem tarafından otomatik olarak "Logout" edilerek giriş ekranına yönlendirilir.
+*   **Kayıt (Register) Koruması:** Kötü niyetli kişilerin form verileriyle (Örn: Postman) oynayarak sisteme `super_admin` eklemeye çalışmasını engellemek için, arka uçta kayıt anında katı bir "Role Data" kontrolü eklendi.
+*   **Tam Yetki Entegrasyonu (Kurucu Kapsamı):** Projenin başlangıcında sadece `admin` rolü var sayıldığı için HTML kodlarındaki (`base.html`, `dashboard.html` vb.) ve backend Python rotalarındaki (`routes.py`) yüzlerce yetki kısıtlaması, `super_admin` (Kurucu) rolünü de kapsayacak şekilde (`if current_user.role in ['admin', 'super_admin']`) güncellendi. Kurucu, artık CRM dışa aktarma, bildirim gönderme ve her bir müşteriyi dilediği arayıcıya atama gibi tüm ayrıcalıklı yetkilere sahiptir.
+*   **Renkli Rozetler (Dashboard UI):** Müşteri listesi tablosuna yeni bir sütun eklenerek TailwindCSS destekli renk kodlamaları yapıldı. "Ulaşıldı" için yeşil, "Telefonu Açmadı" için kırmızı, "Tekrar Aranacak" için sarı ve "Yeni Kayıt" için nötr gri renkli şık rozetler tasarlandı. Son işlemi yapan yetkilinin kullanıcı adı (username) rozet içerisinde görünür kılındı.
+
+## 6. Hata Giderme: SQLAlchemy Multiple Foreign Key Yolu Hatası
+Müşteri modeline "son arayan" (`last_called_by_id`) adında ikinci bir kullanıcı ilişkisi (foreign key) eklenmesi, veritabanı ORM'sinde (SQLAlchemy) kafa karışıklığına yol açmıştı. 
+*   **Çözüm:** `app/models.py` dosyasındaki `User` modeli üzerinde bulunan `customers` ilişkisine `foreign_keys="[Customer.assigned_user_id]"` parametresi açıkça eklendi. Bu sayede bir kullanıcının müşterileri listelenirken sadece "atandığı" kişilerin baz alınması, "son arayan" olduğu kayıtların ise listeyi karıştırmaması sağlandı. Uygulamanın çökmesine (crash) neden olan hata tamamen giderildi.
+
+## 7. Hata Giderme: Kayıt Formu (Register) Sessiz Doğrulama Hatası
+Yeni kullanıcı eklerken formun anlamsızca sayfayı yenileyip hata vermemesi sorunu (Silent Validation Error) giderildi.
+*   **Arayüz Eksikliği Giderildi:** Form yapısında (WTForms) zorunlu kılınan ancak HTML tarafında (register.html) unutulan `confirm_password` (Şifreyi Onayla) alanı Dark Tech temasına uygun olarak şablona eklendi.
+*   **Hataların Görünür Kılınması:** Şablondaki her input alanının altına hataları ekrana yazdıran (`<span class="text-error...">{{ error }}</span>`) Jinja döngüleri yerleştirildi.
+*   **Arka Plan (Backend) Loglama:** İleride çıkabilecek form sorunlarını daha hızlı tespit edebilmek için `/register` rotasına hata dökümünü terminale basan (`print("FORM HATALARI:", form.errors)`) basit bir loglama komutu entegre edildi.
+
+## Doğrulama
+Bütün form sayfalarında CSRF (`{{ form.hidden_tag() }}`) tokenları ve Python validation (WTForms) hataları korunarak, tasarım hataları gösterecek şekilde ("text-error text-sm") yeniden entegre edildi. Yönlendirmeler (`url_for`) hiçbir şekilde bozulmadı.
+
+Tüm sistem artık saf, modern ve tek bir tasarım diline sadık şekilde çalışmaktadır. Geliştirme sunucunuzu çalıştırarak (`flask run`) yeni CRM ekranınızın tadını çıkarabilirsiniz!

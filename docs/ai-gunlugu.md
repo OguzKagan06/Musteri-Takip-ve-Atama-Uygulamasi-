@@ -399,3 +399,19 @@ Müşteri listesini dinamik sayfalama (pagination) ile yönetilebilir kılmak ve
 
 ### Sonuç
 CRM sistemi artık sadece bir veri kayıt aracı değil, filtreleme yapabilen, gerçek zamanlı istatistik sunan ve kullanımı son derece rahat bir 'Command Center' haline geldi.
+
+## Oturum 12 [31/05/2026]
+### Hedef
+Kullanıcı yönetim panelini (User Management) Enterprise standartlarına çekmek, veritabanı bütünlüğünü koruyan güvenli hesap silme (MFA) mekanizması kurmak ve Rol Tabanlı Erişim Kontrolü (RBAC) hiyerarşisini (Kurucu - Yönetici - Arayıcı) sisteme entegre etmek.
+
+### Operasyon Adımları ve Öğrendiklerim
+1. **Güvenli Hesap Silme ve Veritabanı Bütünlüğü (Database Integrity):** Adminlerin sistemdeki kullanıcıları silebileceği güvenli bir altyapı kuruldu. Silme işlemi sırasında kazaları ve yetkisiz işlemleri önlemek için Admin'den kendi şifresini girmesi istendi (MFA mantığı). Bir arayıcı silindiğinde sistemin çökmemesi için, o kişiye bağlı müşterilerin (`Customer`) `assigned_user_id` ve `last_called_by_id` verileri güvenli bir şekilde `NULL` (Atanmadı) konumuna çekildi.
+2. **UI Hata Ayıklama (Modal Overflow Fix):** Kullanıcı listesindeki "Sil" butonuna tıklandığında açılan Alpine.js onay penceresinin (Modal) tablo dışına taşamaması (overflow) sorunu, `fixed` ve `z-index` sınıflarıyla ekranın tam ortasına sabitlenerek çözüldü. Kullanıcı listesi `.order_by()` kullanılarak rol sırasına (Yöneticiler üstte) göre dizildi.
+3. **RBAC ve 'Super Admin' (Kurucu) Entegrasyonu:** Sisteme salt (mutlak) yetkiye sahip "Kurucu" (super_admin) rolü eklendi. Yetki hiyerarşisi şu kurallarla katı bir şekilde sınırlandırıldı:
+   - Kurucu herkesi ekleyip silebilir ve kendi silinemez.
+   - Yöneticiler (admin) sadece arayıcıları (user) silebilir, başka yöneticileri silemez.
+   - Arayıcılar yönetim paneline erişemez.
+4. **Yetki Yayılımı (Authorization Propagation):** Veritabanından rol `super_admin` olarak güncellendiğinde uygulamanın eski kodlarındaki `== 'admin'` koşullarının (Strict String Matching) Kurucu'yu engellemesi sorunu tespit edildi. Tüm projedeki yetki denetimleri `in ['admin', 'super_admin']` (kapsayıcı liste) mantığıyla güncellenerek Kurucu'ya tüm kapılar açıldı.
+
+### Sonuç
+CRM sistemi artık sadece verileri yöneten bir araç değil; yetki sınırları net çizilmiş, veritabanı ilişkileri güvenli bir şekilde ayrıştırılabilen ve kendi kendini koruyabilen tam teşekküllü, kurumsal bir SaaS ürünü haline geldi.

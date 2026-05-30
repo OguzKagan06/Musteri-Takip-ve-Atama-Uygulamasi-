@@ -1,0 +1,33 @@
+# Render & PostgreSQL Dağıtım (Deployment) Planı
+
+Cyber Gate CRM uygulamasının Render platformu üzerinde canlıya alınabilmesi ve Render'ın sunduğu PostgreSQL eklentisiyle (Add-on) sorunsuz çalışabilmesi için aşağıdaki yapılandırmaları yapmayı planlıyorum.
+
+## User Review Required
+
+Lütfen Render hazırlıkları için oluşturulacak dosyaları ve yapılacak değişiklikleri inceleyip onaylayın. 
+
+## Proposed Changes
+
+### [NEW] Procfile
+Render'ın web sunucusunu (Gunicorn) nasıl başlatacağını bilebilmesi için ana dizinde bir `Procfile` dosyası oluşturulacak.
+*   **İçerik:** `web: gunicorn run:app`
+
+### [NEW] runtime.txt
+Render'ın doğru Python sürümünü kullanabilmesi için ana dizinde oluşturulacak.
+*   **İçerik:** `python-3.12.3` (Güncel ve stabil bir sürüm)
+
+### [MODIFY] requirements.txt
+Bağımlılık (dependency) listemize canlı ortam web sunucusu (Gunicorn) ve PostgreSQL veritabanı sürücüsü eklenecek.
+*   `gunicorn` eklenecek.
+*   `psycopg2-binary` eklenecek.
+
+### [MODIFY] config.py
+Render, bize bağlandığımız veritabanının linkini ortam değişkenlerinde `DATABASE_URL` adıyla verir. Ayrıca Render'ın verdiği PostgreSQL linkleri genelde `postgres://` ile başlar, fakat güncel SQLAlchemy sürümleri `postgresql://` (sonunda "ql" olan) şeklini zorunlu tutar. Bu uyumsuzluğu (URL hatasını) çözmek için config güncellenecek.
+*   Veritabanı linkini çeken kod parçası şu şekilde revize edilecek: `DATABASE_URL` değişkenini kontrol et, yoksa `SQLALCHEMY_DATABASE_URI`'a veya local `sqlite`'a düş.
+*   Eğer link `postgres://` ile başlıyorsa, bunu kod içinde otomatik olarak `postgresql://` olarak değiştir.
+
+## Verification Plan
+1. `Procfile`, `runtime.txt` dosyalarının ana dizine sorunsuzca eklendiği teyit edilecek.
+2. `requirements.txt` dosyasının içine `gunicorn` ve `psycopg2-binary` paketlerinin hatasız yazıldığı doğrulanacak.
+3. `config.py` içinde `DATABASE_URL` okuma ve Render uyumluluk mantığının (postgres -> postgresql) başarıyla yerleştirildiği incelenecek.
+4. Bu aşamadan sonra projeniz GitHub'a itilip (push), Render üzerinden tek tıkla canlıya alınmaya hazır hale gelecek.

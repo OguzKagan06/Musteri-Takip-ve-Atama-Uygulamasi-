@@ -227,3 +227,33 @@ Arama işlemlerinde URL parametrelerinin (`GET request`) kullanım mantığını
 ### Ekstra Güvenlik İyileştirmesi (Hotfix)
 - **Sorun:** Sistemi test ederken, normal yetkilere sahip "arayıcı" kullanıcıların da kendi kendilerine müşteri ekleyebildiğini ve veri tutarlılığını bozabileceğini (business logic flaw) fark ettim.
 - **Çözüm:** Ajanı yönlendirerek `customer/new` rotasına sıkı bir RBAC kontrolü (`if current_user.role != 'admin'`) eklettim. Yetkisiz girişleri engellemekle kalmayıp, arayüzdeki (UI) "Yeni Müşteri Ekle" butonunu da Jinja koşulu ile normal kullanıcılardan gizleyerek sistemin güvenliğini tam kurumsal bir yapıya kavuşturdum.
+
+## Oturum 7 [30/05/2026]
+### Hedef
+Uygulamanın ölçeklenebilirliğini artırmak için sayfalandırma (pagination), idari işlemler için müşteri silme yetkisi ve hata yönetimi için özel 404/500 sayfalarının entegrasyonu.
+
+### Verdiğim Promptlar
+Bağlam: CRM sistemimize son profesyonel dokunuşları yapıyoruz. Müşteri silme özelliği, özel hata sayfaları (404 ve 500) ve sayfa yüklenme performansını artırmak için Dashboard'a sayfalandırma (pagination) ekleyeceğiz.
+
+Hedef: Adminlere müşteri silme yetkisi ver, hataları şık sayfalarla yönet ve Dashboard listesini sayfalandır.
+
+Adımlar:
+1. Sayfalandırma (Pagination):
+   - `app/crm/routes.py`: `/dashboard` rotasını `db.paginate()` (SQLAlchemy 2.x stili) kullanacak şekilde güncelle. Sayfa başına (per_page) 5 müşteri göster (test etmesi kolay olsun). URL'den `page` parametresini al (Örn: ?page=2).
+   - `app/templates/crm/dashboard.html`: Tablonun altına Bootstrap 5 Pagination bileşenini ekle. Jinja ile `customers.iter_pages()` kullanarak sayfaları render et. Arama (q) yapıldıysa sayfa değiştirirken arama parametresini de koru.
+2. Müşteri Silme (Delete):
+   - `app/crm/routes.py`: `/customer/<int:id>/delete` rotası ekle (POST). SADECE adminler silebilsin (yetki kontrolü yap, arayıcı denerse engelle). Müşteri silindiğinde o müşteriye ait notları da silmeyi unutma (cascade yoksay, manuel silebilirsin veya db'de ayarlayabilirsin).
+   - `app/templates/crm/customer_detail.html`: Sadece adminlerin görebileceği kırmızı bir "Müşteri Sil" formu/butonu ekle. Tıklanınca JavaScript ile "Emin misiniz?" onayı (`onclick="return confirm('Bu müşteriyi tamamen silmek istediğinize emin misiniz?')"`) istesin.
+3. Özel Hata Sayfaları (404 ve 500):
+   - `app/main/routes.py`: `@bp.app_errorhandler(404)` ve `@bp.app_errorhandler(500)` fonksiyonlarını ekle.
+   - `app/templates/errors/`: `404.html` (Sayfa Bulunamadı) ve `500.html` (Sunucu Hatası) dosyalarını Bootstrap 5 ile kullanıcı dostu bir tasarımla oluştur (İçinde anasayfaya dönüş butonu olsun).
+
+Kısıtlar:
+- Plan modunda ilerle ve onayımı bekle.
+- SQLAlchemy 2.x stili paginate kullanımına dikkat et (`db.paginate(query, page=page, per_page=5)`).
+
+### Ajanın Önerdiği Plan
+Ajan; Dashboard sorgularını `db.paginate()` fonksiyonuyla güncelleyerek sayfalandırma ekledi, admin yetkisiyle `delete` rotası oluşturdu ve veritabanı `cascade` özelliğini kullanarak müşteri silindiğinde notların da silinmesini sağladı. Ayrıca `errorhandler` ile hata sayfalarını projenin ana tasarımına uygun şekilde modüler hale getirdi.
+
+### Bu Oturumdan Öğrendiğim
+Büyük veri setlerini `paginate` ile yönetmenin uygulamanın hızını ve kararlılığını ne kadar etkilediğini, ayrıca bir yazılımda hata yönetiminin (error handling) sadece hata yakalamak değil, kullanıcıya dostça ve yönlendirici bir arayüz sunmak olduğunu kavradım.

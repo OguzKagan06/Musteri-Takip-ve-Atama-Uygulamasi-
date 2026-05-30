@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Ana Portal{% endblock %}
+
+{% block content %}
+<div class="row mt-4 mb-4">
+    <div class="col-12 text-center">
+        <h2 class="fw-bold">Cyber Gate CRM'e Hoş Geldiniz</h2>
+        <p class="text-muted fs-5">Lütfen işlem yapmak istediğiniz modülü seçiniz.</p>
+    </div>
+</div>
+
+<div class="row justify-content-center g-4">
+    <!-- Aktif Modül: CRM -->
+    <div class="col-md-6 col-lg-3">
+        <div class="card h-100 shadow border-primary" style="transition: transform 0.2s;">
+            <div class="card-body text-center d-flex flex-column justify-content-center py-5">
+                <h4 class="card-title text-primary mb-4">Müşteri Yönetimi<br>(CRM)</h4>
+                <a href="{{ url_for('crm.dashboard') }}" class="btn btn-primary btn-lg mt-auto">Modüle Git</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pasif Modül: Gelişmiş Raporlar -->
+    <div class="col-md-6 col-lg-3">
+        <div class="card h-100 shadow-sm bg-light position-relative">
+            <div class="card-body text-center d-flex flex-column justify-content-center py-5">
+                <span class="badge bg-secondary position-absolute top-0 start-50 translate-middle mt-2">Çok Yakında</span>
+                <h4 class="card-title text-muted mb-4">Gelişmiş<br>Raporlar</h4>
+                <button class="btn btn-secondary btn-lg mt-auto" disabled>Modüle Git</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pasif Modül: Takvim & Görevler -->
+    <div class="col-md-6 col-lg-3">
+        <div class="card h-100 shadow-sm bg-light position-relative">
+            <div class="card-body text-center d-flex flex-column justify-content-center py-5">
+                <span class="badge bg-secondary position-absolute top-0 start-50 translate-middle mt-2">Çok Yakında</span>
+                <h4 class="card-title text-muted mb-4">Takvim &<br>Görevler</h4>
+                <button class="btn btn-secondary btn-lg mt-auto" disabled>Modüle Git</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pasif Modül: Kullanıcı İstatistikleri -->
+    <div class="col-md-6 col-lg-3">
+        <div class="card h-100 shadow-sm bg-light position-relative">
+            <div class="card-body text-center d-flex flex-column justify-content-center py-5">
+                <span class="badge bg-secondary position-absolute top-0 start-50 translate-middle mt-2">Çok Yakında</span>
+                <h4 class="card-title text-muted mb-4">Kullanıcı<br>İstatistikleri</h4>
+                <button class="btn btn-secondary btn-lg mt-auto" disabled>Modüle Git</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

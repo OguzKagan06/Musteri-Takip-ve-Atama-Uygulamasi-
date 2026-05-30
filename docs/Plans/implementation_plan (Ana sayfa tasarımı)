@@ -1,0 +1,41 @@
+# Ana Portal (Hub) ve Alt Bilgi (Footer) Tasarım Planı
+
+Bu plan, uygulamanıza giriş yapan kullanıcıları ilk olarak karşılayacak şık bir modül portalı oluşturmayı ve tüm sayfalarda görünecek kurumsal bir alt bilgi (footer) yapısını sisteme entegre etmeyi amaçlamaktadır.
+
+## User Review Required
+
+Lütfen portalda sergilenecek modül isimlerini (CRM, Raporlar, Takvim vb.) ve eklenecek olan Footer içeriğini ("Copyright © 2026 Cyber Gate CRM") inceleyin. Tasarımlar tamamen Bootstrap 5'in kurumsal yetenekleri kullanılarak gerçekleştirilecektir.
+
+## Proposed Changes
+
+### 1. Anasayfa (Hub) Rotası
+
+#### [MODIFY] app/main/routes.py
+*   `/` (index) rotasının çalışma mantığı değiştirilecek.
+*   Eğer kullanıcı giriş yapmamışsa (`not current_user.is_authenticated`), hızlıca aksiyon alması için `auth.login` sayfasına yönlendirilecek.
+*   Eğer kullanıcı sisteme girmişse, doğrudan CRM'e değil, yeni oluşturacağımız ana kontrol merkezine (`main/index.html`) render işlemi yapılacak.
+
+---
+
+### 2. Hub Arayüzü Tasarımı
+
+#### [NEW/MODIFY] app/templates/main/index.html
+*   Bootstrap 5'in Grid (`row`, `col-md-3`) ve Card yapısı kullanılarak 4 adet şık modül kartı eklenecek.
+*   **Kart 1 (Aktif):** "Müşteri Yönetimi (CRM)" isimli, canlı mavi (veya primary) tonlara sahip, içerisindeki butonu `crm.dashboard` rotasına giden bir kart.
+*   **Kart 2, 3 ve 4 (Pasif):** "Gelişmiş Raporlar", "Takvim & Görevler" ve "Kullanıcı İstatistikleri" adını taşıyan gölgeli kartlar. Butonları tıklanamaz (`disabled`) olacak ve üzerlerinde Bootstrap rozeti (`<span class="badge bg-secondary">Çok Yakında</span>`) yer alacak.
+*   Arayüz tamamen Türkçe, estetik ve mobil cihazlarla uyumlu tasarlanacak.
+
+---
+
+### 3. Global Footer ve Navbar Bağlantısı
+
+#### [MODIFY] app/templates/base.html
+*   Sayfanın `<body>` etiketine `d-flex flex-column min-vh-100` sınıfları eklenecek (Böylece sayfa kısacık olsa bile footer hep ekranın en altında yapışık kalacak).
+*   Ana bloğun (`{% block content %}`) altına, `mt-auto` (üstten iten boşluk) class'ına sahip bir `<footer>` bileşeni yerleştirilecek.
+*   Footer içeriği: ortalanmış (`text-center`) şekilde `"Copyright © 2026 Cyber Gate CRM - Tüm hakları saklıdır."`
+*   Navbar'da sol üstte bulunan Marka adına tıklandığında, kullanıcının doğrudan bu Hub (`main.index`) sayfasına dönebilmesi için `href="{{ url_for('main.index') }}"` tanımlaması yapılacak.
+
+## Verification Plan
+1. Sistem açıldığında ve giriş yapılmadığında yönlendirmenin Login ekranına gittiği görülecek.
+2. Giriş yapıldığında 4 modüllü ana ekranın geldiği, "Çok Yakında" yazan butonlara tıklanamadığı doğrulanacak.
+3. Tüm sayfaların (Kayıt, CRM vb.) en altında Footer'ın düzgün konumlandırıldığı teyit edilecek.

@@ -190,6 +190,12 @@
                 <span class="font-body-md text-body-md">Kullanıcı Ekle</span>
             </a>
         </li>
+        <li>
+            <a class="flex items-center gap-3 px-3 py-3 rounded-lg {% if request.endpoint == 'main.send_notification' %}text-primary font-bold border-r-2 border-primary bg-primary/10{% else %}text-on-surface-variant font-medium opacity-70 hover:bg-primary/10 hover:text-primary hover:opacity-100{% endif %} transition-all duration-200" href="{{ url_for('main.send_notification') }}">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' {% if request.endpoint == 'main.send_notification' %}1{% else %}0{% endif %};">campaign</span>
+                <span class="font-body-md text-body-md">Bildirim Gönder</span>
+            </a>
+        </li>
         {% endif %}
     {% else %}
         <li>

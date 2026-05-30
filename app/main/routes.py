@@ -1,8 +1,9 @@
-from flask import render_template, redirect, url_for, request
+from flask import render_template, redirect, url_for, request, flash
 from flask_login import current_user, login_required
 from app.main import bp
 from app import db
-from app.models import Notification
+from app.models import Notification, User
+from app.main.forms import SendNotificationForm
 
 @bp.app_context_processor
 def inject_notifications():
@@ -20,6 +21,27 @@ def read_notification(id):
         notification.is_read = True
         db.session.commit()
     return redirect(request.referrer or url_for('main.index'))
+
+@bp.route('/admin/send-notification', methods=['GET', 'POST'])
+@login_required
+def send_notification():
+    if current_user.role != 'admin':
+        flash('Bu sayfaya erişim yetkiniz yok.', 'danger')
+        return redirect(url_for('main.index'))
+    
+    form = SendNotificationForm()
+    users = db.session.scalars(db.select(User).where(User.id != current_user.id)).all()
+    form.user_id.choices = [(user.id, f"{user.username} ({user.role})") for user in users]
+    
+    if form.validate_on_submit():
+        notification = Notification(user_id=form.user_id.data, message=form.message.data)
+        db.session.add(notification)
+        db.session.commit()
+        flash('Bildirim başarıyla gönderildi.', 'success')
+        return redirect(url_for('main.send_notification'))
+        
+    return render_template('main/send_notification.html', form=form)
+
 
 @bp.route('/')
 def index():

@@ -327,3 +327,19 @@ Hata 1: Yeni arayüz şablonu render edilirken UndefinedError: 'app.auth.forms.U
 Hata 1: Yeni kayıt sayfası yüklenirken jinja2.exceptions.UndefinedError: 'app.auth.forms.RegisterForm object' has no attribute 'role' hatası aldım.
 
 Çözüm 1: Hatanın, şablonda bulunan ancak backend form sınıfında tanımlanmayan bir alandan kaynaklandığını buldum. Bu alanın projede bir güvenlik açığı yaratacağını değerlendirerek, arka plana eklemek yerine app/templates/auth/register.html dosyasındaki ilgili frontend kod bloğunu ajana sildirerek hem hatayı çözdüm hem de sistemi güvenceye aldım.
+
+## Oturum 10 [31/05/2026]
+### Hedef
+Tasarımda yer alan sağ üstteki statik bildirim zilini veritabanı ile bağlayarak dinamik, işlevsel ve gerçek zamanlı bir bildirim (Notification) sistemine dönüştürmek.
+
+### Verdiğim Promptlar
+1. "Projemize yeni Tailwind tabanlı karanlık (dark) temayı entegre ettik. Şimdi sağ üstteki statik bildirim zilini arka uçla (backend) bağlayarak dinamik hale getireceğiz. Hedef: Kullanıcılara bildirim gönderebilen ve okunmamış sayısını gösteren açılır menülü bir sistem kurmak..."
+
+### Ajanın Önerdiği Plan
+Ajan, veritabanına `Notification` modeli ekleyip bunu `User` modeliyle `cascade` (otomatik silinme) ilişkisine bağladı. Bildirimlerin her sayfada görünebilmesi için Flask'ın `@bp.app_context_processor` dekoratörünü kullanarak global değişkenler (`unread_notifications_count`) oluşturdu. Frontend (arayüz) tarafında ise açılır menü (dropdown) animasyonları için jQuery yerine çok daha hafif ve modern olan Alpine.js kütüphanesini tercih etti.
+
+### Bu Oturumdan Öğrendiğim
+Backend tarafında, her sayfaya (`render_template`) ayrı ayrı veri göndermek yerine Flask'taki `context_processor` yapısını kullanarak değişkenleri tüm sisteme global olarak nasıl enjekte edebileceğimi kavradım. Frontend tarafında ise Tailwind CSS ile birlikte Alpine.js kullanmanın UI (Kullanıcı Arayüzü) etkileşimlerini ne kadar pratik ve performanslı hale getirdiğini deneyimledim.
+
+### Karşılaştığım Hatalar ve Test Süreci
+- **Test ve Doğrulama:** Yeni veritabanı tablosu eklendiği için önce terminalden `flask db migrate` ve `upgrade` komutlarını çalıştırarak modeli işledim. Ardından sistemin tepkisini ölçmek için `flask shell` komut dosyasını açıp SQLAlchemy komutlarıyla (`db.session.add()`) veritabanına doğrudan sahte (mock) bir bildirim ekledim. UI tarafında kırmızı rozetin (badge) ve okundu/okunmadı mantığının kusursuz çalıştığını doğruladım.

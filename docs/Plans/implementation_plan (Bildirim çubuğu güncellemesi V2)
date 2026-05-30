@@ -1,0 +1,47 @@
+# Admin Bildirim Gönderme Ekranı Planı
+
+Adminlerin sistemdeki arayıcılara (veya diğer kullanıcılara) manuel olarak sistem içi bildirim gönderebileceği, karanlık temaya (Dark Tech Minimalism) uygun bir arayüz oluşturacağız.
+
+## User Review Required
+
+Aşağıdaki yeni eklenecek form, rota ve şablon yapılarını lütfen inceleyip onaylayın.
+
+## Proposed Changes
+
+### app/main/forms.py
+Ana modülümüz için yeni bir form dosyası oluşturacağız.
+
+#### [NEW] app/main/forms.py
+*   **SendNotificationForm Modeli:**
+    *   `user_id` (SelectField): Sistemdeki alıcıları seçeceğimiz liste. (Backend rotasında bu liste veritabanından dinamik doldurulacak.)
+    *   `message` (TextAreaField): Gönderilecek metni barındıran çok satırlı alan (`DataRequired` zorunlu).
+    *   `submit` (SubmitField): "Gönder" butonu.
+
+### app/main/routes.py
+Adminlere özel gönderim yapacak yeni bir rota tasarlayacağız.
+
+#### [MODIFY] app/main/routes.py
+*   **`/admin/send-notification` Rotası:**
+    *   Sadece `current_user.role == 'admin'` olan kullanıcılar girebilecek. Aksi halde ana sayfaya yönlendirilip yetki hatası (danger flash) fırlatılacak.
+    *   Form başlatıldığında `user_id` alanı için `db.select(User)` yapılarak sistemdeki tüm kullanıcılar (adminin kendisi hariç) çekilecek ve `form.user_id.choices` listesine eklenecek.
+    *   Form doğrulandığında seçilen kullanıcıya (user_id) bir `Notification` objesi oluşturulup kaydedilecek.
+
+### app/templates/main/send_notification.html
+Kullanıcıya özel yeni bir sayfa (arayüz) oluşturacağız.
+
+#### [NEW] app/templates/main/send_notification.html
+*   **Glassmorphism Form:**
+    *   Sistemin geri kalanıyla uyumlu (`.glass-card`, `bg-surface-container-high` vb.) yeni bir form sayfası.
+    *   SelectField ve TextAreaField için Tailwind form odaklanma (focus) neon kırmızı efektleri uygulanacak.
+
+### app/templates/base.html
+Yeni özelliği sisteme entegre edeceğiz.
+
+#### [MODIFY] app/templates/base.html
+*   Sol menü (Sidebar) bölümüne `{% if current_user.role == 'admin' %}` şartıyla bir link eklenecek.
+*   Link adı: "Bildirim Gönder", ikonu: `campaign` (veya `send`) olacak ve yeni oluşturduğumuz `/admin/send-notification` rotasına işaret edecek.
+
+## Verification Plan
+1. Admin hesabıyla giriş yapılıp sol menüdeki "Bildirim Gönder" bağlantısının aktif olduğu doğrulanacak.
+2. Bildirim formu kullanılarak listeden bir arayıcı seçilip mesaj gönderilecek ve başarısı (flash mesaj) onaylanacak.
+3. Test için bildirim gönderilen hesaba girilip sağ üstteki açılır menüde bildirimin belirdiği ve okunmamış (rozetli) olduğu UI üzerinde test edilecek.

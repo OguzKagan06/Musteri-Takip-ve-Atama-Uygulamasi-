@@ -1,0 +1,17 @@
+# Müşteri Ekleme Yetkisi Güncellemesi Tamamlandı
+
+Planladığımız doğrultuda, CRM sistemindeki "Yeni Müşteri Ekle" işlevi tamamen admin yetkisine kısıtlanarak veri güvenliği ve iş akışı kontrolü artırıldı.
+
+## Yapılan Değişiklikler
+
+*   **1. Backend Güvenliği (RBAC) - `app/crm/routes.py`**
+    *   `/customer/new` rotasının içerisine, herhangi bir işlem (veya form render) yapılmadan önce çalışacak olan bir güvenlik duvarı (`current_user.role != 'admin'`) yerleştirildi.
+    *   Eğer sıradan bir "arayıcı" kullanıcı adres çubuğuna doğrudan `http://.../crm/customer/new` yazıp bu sayfaya zorla girmeye çalışırsa, sistem işlemi durdurarak `"Bu sayfaya erişim yetkiniz yok."` uyarısı ile kullanıcıyı güvenli bir şekilde Dashboard'a geri göndermektedir.
+    *   Sadece adminlerin girebildiği garanti altına alındığından, arka planda (form kaydedilirken) bulunan atama denetimi de sadeleştirildi.
+
+*   **2. Arayüz İyileştirmesi - `app/templates/crm/dashboard.html`**
+    *   Dashboard sayfasında bulunan mavi "Yeni Müşteri Ekle" butonu, Jinja template motorunun `{% if current_user.role == 'admin' %}` kalkanı içerisine alındı.
+    *   Artık "arayıcı" statüsündeki bir kişi sisteme giriş yaptığında sayfa açılırken bu butonu teknik olarak hiç göremeyecek. Böylece temiz bir kullanıcı deneyimi sunuldu.
+
+## Test ve Doğrulama
+Yapılan değişikliklerin ardından kod dosyalarındaki hata tespiti (syntax check) yapıldı ve herhangi bir soruna rastlanmadı. Veritabanında bir değişiklik yapmadığımız için `flask run` komutunu kullanarak, admin hesabınızla "Yeni Müşteri Ekle" butonunun aktifliğini test edebilir, farklı yetkilere sahip bir hesapla girerek güvenlik duvarını doğrulayabilirsiniz.

@@ -191,3 +191,35 @@ Veritabanı şemasına sonradan sütun eklerken (özellikle SQLite'ta) yaşanabi
 - **Çözüm 1:** Veritabanına model değişikliğinin yansımadığını fark edip veritabanını sıfırlamak üzere `migrations` klasörünü sildim.
 - **Hata 2:** Migrasyon işlemlerini baştan yapmaya çalışırken `Can't locate revision identified by '9d7410296bea'` (Hayalet Migrasyon) hatası aldım.
 - **Çözüm 2:** Bu hatanın, `migrations` klasörünü silmeme rağmen `instance` klasörü altındaki fiziksel veritabanı dosyasının (`crm.db`) içinde kalan eski geçmiş kaydından (`alembic_version`) kaynaklandığını tespit ettim. Çözüm olarak `instance` içindeki `crm.db` dosyasını tamamen sildim ve terminalden sırasıyla `flask db init`, `flask db migrate`, `flask db upgrade` ve `flask create-admin` komutlarını çalıştırarak veritabanını en güncel ve temiz haliyle sıfırdan kurdum.
+
+## Oturum 6 [30/05/2026]
+### Hedef
+Kullanıcıların kendi yetkileri dahilindeki müşterileri ad, soyad veya referans koduna göre filtreleyebileceği bir Arama (Search) sisteminin Dashboard'a entegre edilmesi.
+
+### Verdiğim Promptlar
+1. Bağlam: Profil ve avatar yükleme özellikleri tamamlandı. Şimdi CRM Dashboard'una bir arama (Search) işlevi ekleyeceğiz.
+
+Hedef: Kullanıcıların (kendi yetkileri dahilindeki) müşterileri ad, soyad veya referans koduna göre arayabileceği bir filtreleme sistemi kurmak.
+
+Adımlar:
+1. app/crm/routes.py: `/dashboard` rotasını güncelle.
+   - `request.args.get('q')` ile URL'den arama terimini al (Örn: /dashboard?q=ahmet).
+   - `sqlalchemy` modülünden `or_` fonksiyonunu import et.
+   - Eğer arama terimi varsa, mevcut RBAC (admin/arayıcı yetki) sorgusuna ek olarak `.where(or_(Customer.first_name.ilike(f'%{q}%'), Customer.last_name.ilike(f'%{q}%'), Customer.reference_code.ilike(f'%{q}%')))` filtresini ekle.
+2. app/templates/crm/dashboard.html: 
+   - Müşteri tablosunun hemen üstüne Bootstrap 5 ile şık bir arama çubuğu (Search bar) ekle.
+   - Form `<form method="GET" action="{{ url_for('crm.dashboard') }}">` şeklinde olmalı ve input name="q" olmalı.
+   - Arama yapıldıysa, arama çubuğunda aranan kelime (value) yazılı kalsın ve tablonun üstünde "X için arama sonuçları" gibi ufak bir bilgi veya aramayı temizle (Temizle butonu) seçeneği olsun.
+
+Kısıtlar:
+- Plan modunda ilerle.
+- Veritabanı sorgularında kesinlikle SQLAlchemy 2.x stilini (db.select) bozma, sadece arama filtresini entegre et.
+
+### Ajanın Önerdiği Plan
+Ajan, URL'den `GET` isteği ile arama terimini (`q`) alıp, SQLAlchemy `or_` operatörü ve `ilike` fonksiyonunu kullanarak mevcut RBAC (Rol Bazlı Erişim) sorgusunun üzerine bir arama filtresi eklemeyi planladı. Ayrıca promptumdaki `first_name` hatasını fark edip modele uygun şekilde `name` olarak revize etti.
+
+### Plan'da Sorguladıklarım
+Ajanın veritabanı modellerimdeki gerçek sütun isimlerini (`name`, `surname`) hatırlayarak promptumdaki hatayı otonom bir şekilde düzeltmesi ve RBAC mantığını kırmadan filtrelemeyi eklemesi çok başarılıydı, doğrudan onayladım.
+
+### Bu Oturumdan Öğrendiğim
+Arama işlemlerinde URL parametrelerinin (`GET request`) kullanım mantığını ve SQLAlchemy 2.x'te birden fazla filtre koşulunu zincirleme (`query.where().where()`) şeklinde nasıl güvenle ekleyebileceğimi kavradım. Ayrıca AI'ın sadece söyleneni yapan değil, kodun mevcut bağlamını anlayıp hatalı promptları düzeltebilen bir asistan olduğunu gördüm.

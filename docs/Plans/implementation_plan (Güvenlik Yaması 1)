@@ -1,0 +1,32 @@
+# Müşteri Ekleme İşlemini Sadece Admin Yetkisine Alma Planı
+
+Mevcut sistemde arayıcılar (normal kullanıcılar) da kendilerine yeni müşteri ekleyebiliyor. Bu planla birlikte, veri tutarlılığı ve iş akışı güvenliği açısından müşteri ekleme yetkisini yalnızca `admin` rolüne sahip kullanıcılara kısıtlayacağız.
+
+## User Review Required
+
+Lütfen arayüzde gizlenecek buton ve arka planda kurulacak güvenlik kalkanı mantığını inceleyin. Onayınızla birlikte mevcut rotaları koruma altına alıp, arayıcıların sistemi manipüle etmesinin önüne geçeceğiz.
+
+## Proposed Changes
+
+### 1. Rota Güvenliği (RBAC Kısıtlaması)
+
+#### [MODIFY] app/crm/routes.py
+*   `/customer/new` (`new_customer`) rotasının hemen içerisine (form doğrulama işleminden önce) bir kontrol eklenecek:
+    ```python
+    if current_user.role != 'admin':
+        flash('Bu sayfaya erişim yetkiniz yok.', 'danger')
+        return redirect(url_for('crm.dashboard'))
+    ```
+*   Böylece normal bir kullanıcı doğrudan `/crm/customer/new` URL'ini adres çubuğuna yazarak gitmeye çalışsa dahi arka planda sistem tarafından engellenip Dashboard'a geri gönderilecektir.
+*   Rota sadece adminlere özel olacağı için, form kaydedilirken uygulanan `if current_user.role == 'admin'` koşullu mantığı da basitleştirilecektir (Çünkü artık buraya giren herkesin admin olduğunu garanti etmiş olacağız).
+
+### 2. Arayüzün İyileştirilmesi (UI)
+
+#### [MODIFY] app/templates/crm/dashboard.html
+*   Dashboard sayfasında bulunan **"Yeni Müşteri Ekle"** butonu bir Jinja koşul bloğu (`{% if current_user.role == 'admin' %}`) içerisine alınacaktır.
+*   Böylece yetkisi olmayan arayıcılar, sisteme giriş yaptıklarında bu butonu sayfada hiç göremeyecek, arayüz daha sade ve yetki odaklı çalışacaktır.
+
+## Verification Plan
+1. Değişiklikler yapıldıktan sonra "arayıcı" yetkisine sahip bir hesapla giriş yapılacak.
+2. Dashboard ekranında "Yeni Müşteri Ekle" butonunun görünmediği teyit edilecek.
+3. Manuel olarak `/crm/customer/new` rotasına gidilmeye çalışılarak hata mesajının (flash) ve yönlendirmenin doğru çalıştığı doğrulanacak.

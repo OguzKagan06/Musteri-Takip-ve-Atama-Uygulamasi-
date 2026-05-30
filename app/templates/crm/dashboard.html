@@ -5,7 +5,9 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4 mt-3">
     <h2>Müşteriler</h2>
+    {% if current_user.role == 'admin' %}
     <a href="{{ url_for('crm.new_customer') }}" class="btn btn-primary">Yeni Müşteri Ekle</a>
+    {% endif %}
 </div>
 
 <div class="mb-4">

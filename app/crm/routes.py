@@ -29,6 +29,10 @@ def dashboard():
 @bp.route('/customer/new', methods=['GET', 'POST'])
 @login_required
 def new_customer():
+    if current_user.role != 'admin':
+        flash('Bu sayfaya erişim yetkiniz yok.', 'danger')
+        return redirect(url_for('crm.dashboard'))
+        
     form = CustomerForm()
     
     # Populate choices for assigned_user_id
@@ -47,12 +51,9 @@ def new_customer():
             phone=form.phone.data
         )
         
-        if current_user.role == 'admin':
-            assigned_id = form.assigned_user_id.data
-            if assigned_id != 0:
-                customer.assigned_user_id = assigned_id
-        else:
-            customer.assigned_user_id = current_user.id
+        assigned_id = form.assigned_user_id.data
+        if assigned_id != 0:
+            customer.assigned_user_id = assigned_id
             
         db.session.add(customer)
         db.session.commit()

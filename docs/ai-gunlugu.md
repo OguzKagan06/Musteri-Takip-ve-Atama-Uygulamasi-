@@ -1,4 +1,5 @@
 **Geliştirme aşamaları görselleri /docs/img dosyası içindedir.**
+**Gelişrme plan ve yol haritaları /docs/plans dosyası içindedir.**
 
 ## Oturum 1 [30/05/2026]
 ### Hedef

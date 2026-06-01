@@ -19,7 +19,7 @@ Modern, güvenli ve yüksek performanslı Müşteri İlişkileri Yönetimi (CRM)
 
 ## URL ve Bağlantılar
 * Uygulama URL: https://musteri-takip-ve-atama-uygulamasi.onrender.com
-
+* Tanıtım Videosu:https://youtu.be/oqmtkXEc5aM
 
 ## ⚙️ Kurulum ve Çalıştırma
 

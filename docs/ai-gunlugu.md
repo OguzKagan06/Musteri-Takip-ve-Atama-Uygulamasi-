@@ -1,3 +1,5 @@
+**Geliştirme aşamaları görselleri /docs/img dosyası içindedir.**
+
 ## Oturum 1 [30/05/2026]
 ### Hedef
 Proje konusunun belirlenmesi, mimarinin çıkarılması ve Antigravity üzerinde temel Flask 3.x uygulama iskeletinin oluşturulması.

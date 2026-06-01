@@ -17,7 +17,7 @@ Modern, güvenli ve yüksek performanslı Müşteri İlişkileri Yönetimi (CRM)
 * **Frontend:** Tailwind CSS, Alpine.js, Jinja2 Temaları
 * **Güvenlik:** Flask-WTF (CSRF Koruması), Werkzeug Security (Şifre Hashleme)
 
-## URL ve Bağlantılar
+## Bağlantılar
 * Uygulama URL: https://musteri-takip-ve-atama-uygulamasi.onrender.com
 * Tanıtım Videosu:https://youtu.be/oqmtkXEc5aM
 

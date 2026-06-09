@@ -18,7 +18,7 @@ Modern, güvenli ve yüksek performanslı Müşteri İlişkileri Yönetimi (CRM)
 * **Güvenlik:** Flask-WTF (CSRF Koruması), Werkzeug Security (Şifre Hashleme)
 
 ## Bağlantılar
-* Uygulama URL: https://musteri-takip-ve-atama-uygulamasi.onrender.com
+* Uygulama URL: https://musteri-takip-ve-atama-uygulamasi.onrender.com - Kullanıcı adı: admin ş: 123456
 * Tanıtım Videosu:https://youtu.be/oqmtkXEc5aM
 
 ## ⚙️ Kurulum ve Çalıştırma
